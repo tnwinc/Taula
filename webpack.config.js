@@ -24,8 +24,8 @@ module.exports = {
       },
       {
         test: /\.jsx?$/,
-        exclude: /(dist|node_modules|bower_components)/,
-        loader: 'babel'
+        exclude: /(__tests__|dist|node_modules|bower_components)/,
+        loader: 'babel?optional=runtime'
       }
     ]
   }

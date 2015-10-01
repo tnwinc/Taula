@@ -52,7 +52,6 @@
     "react/self-closing-comp": 2, // Prevent extra closing tags for components without children
     "react/wrap-multilines": 2, // Prevent missing parentheses around multilines JSX
     "react/no-direct-mutation-state": 2,
-    "react/forbid-prop-types": 2,
     "react/sort-comp": [2, {
       order: ['lifecycle', 'everything-else', 'private', 'handlers', 'subrenders', 'render'],
       groups: {
