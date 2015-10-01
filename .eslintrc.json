@@ -1,0 +1,65 @@
+{
+  "env": {
+    "browser": true,
+    "node": false,
+    "es6": true
+  },
+
+  "plugins": ["react"],
+
+  "ecmaFeatures": {
+    "jsx": true,
+    "modules": true
+  },
+
+  "rules": {
+    "comma-dangle": 2, // disallow or enforce trailing commas
+    "no-constant-condition": 2, // disallow use of constant expressions in conditions
+    "no-control-regex": 2, // disallow control characters in regular expressions
+    "no-debugger": 2, // disallow use of debugger
+    "no-dupe-args": 2, // disallow duplicate arguments in functions
+    "no-dupe-keys": 2, // disallow duplicate keys when creating object literals
+    "no-duplicate-case": 2, // disallow a duplicate case label.
+    "no-empty": 2, // disallow empty statements
+    "no-empty-character-class": 2, // disallow the use of empty character classes in regular expressions
+    "no-ex-assign": 2, // disallow assigning to the exception in a catch block
+    "no-inner-declarations": 2, // disallow function or variable declarations in nested blocks
+    "no-invalid-regexp": 2, // disallow invalid regular expression strings in the RegExp constructor
+    "no-irregular-whitespace": 2, // disallow irregular whitespace outside of strings and comments
+    "no-negated-in-lhs": 2, // disallow negation of the left operand of an in expression
+    "no-obj-calls": 2, // disallow the use of object properties of the global object (Math and JSON) as functions
+    "no-regex-spaces": 2, // disallow multiple spaces in a regular expression literal
+    "no-sparse-arrays": 2, // disallow sparse arrays
+    "no-unreachable": 2, // disallow unreachable statements after a return, throw, continue, or break statement
+    "use-isnan": 2, // disallow comparisons with the value NaN
+    "valid-typeof": 2, // Ensure that the results of typeof are compared against a valid string
+    "strict": 0, // controls location of Use Strict Directives. 0: required by `babel-eslint`
+    "no-console": 2,
+
+    "react/display-name": 2, // Prevent missing displayName in a React component definition
+    "react/no-danger": 2, // Prevent using dangerous properties
+    "react/jsx-no-undef": 2, // Disallow undeclared variables in JSX
+    "react/jsx-uses-react": 2, // Prevent React to be incorrectly marked as unused
+    "react/jsx-uses-vars": 2, // Prevent variables used in JSX to be incorrectly marked as unused
+    "react/no-did-mount-set-state": 2, // Prevent usage of setState in componentDidMount
+    "react/no-did-update-set-state": 2, // Prevent usage of setState in componentDidUpdate
+    "react/no-multi-comp": 2, // Prevent multiple component definition per file
+    "react/no-unknown-property": 2, // Prevent usage of unknown DOM property
+    "react/prop-types": [2, {
+      ignore: ['ref', 'className']
+    }], // Prevent missing props validation in a React component definition
+    "react/react-in-jsx-scope": 2, // Prevent missing React when using JSX
+    "react/self-closing-comp": 2, // Prevent extra closing tags for components without children
+    "react/wrap-multilines": 2, // Prevent missing parentheses around multilines JSX
+    "react/no-direct-mutation-state": 2,
+    "react/forbid-prop-types": 2,
+    "react/sort-comp": [2, {
+      order: ['lifecycle', 'everything-else', 'private', 'handlers', 'subrenders', 'render'],
+      groups: {
+        handlers: ['/^_?handle.*$/'],
+        private: ['/^_((?!(handle|render)).)+$/'],
+        subrenders: ['/^_?render.*$/']
+      }
+    }]
+  }
+}

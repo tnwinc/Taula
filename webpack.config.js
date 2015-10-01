@@ -1,16 +1,18 @@
 var path = require('path');
 
 module.exports = {
-  port: port,
-  debug: true,
+  entry: './index.js',
   output: {
     path: path.join(__dirname, '/dist'),
     filename: 'InfiniteTable.js',
   },
+  eslint: {
+    configFile: './.eslintrc.json'
+  },
   module: {
     preLoaders: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.jsx?$/,
         include: path.join(__dirname, 'lib'),
         loader: 'eslint-loader'
       }
@@ -19,6 +21,11 @@ module.exports = {
       {
         test: /\.css$/,
         loader: 'style!css'
+      },
+      {
+        test: /\.jsx?$/,
+        exclude: /(dist|node_modules|bower_components)/,
+        loader: 'babel'
       }
     ]
   }
