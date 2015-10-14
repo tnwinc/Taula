@@ -12,6 +12,8 @@
     "modules": true
   },
 
+  "extends": "airbnb",
+
   "rules": {
     "comma-dangle": 2, // disallow or enforce trailing commas
     "no-constant-condition": 2, // disallow use of constant expressions in conditions
