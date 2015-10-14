@@ -29,12 +29,19 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'test/**/*.coffee': ['webpack'],
+      'test/**/*.coffee': ['webpack']
     },
 
     webpack: {
       resolve: webpackConfig.resolve,
       module: {
+        preLoaders: [
+          {
+            test: /\.js$/,
+            exclude: /(dist|node_modules|bower_components)/,
+            loader: 'isparta'
+          }
+        ],
         loaders: webpackConfig.module.loaders
       }
     },
@@ -46,10 +53,18 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['mocha'],
+    reporters: ['mocha', 'coverage'],
 
     mochaReporter: {
       output: 'minimal'
+    },
+
+    coverageReporter: {
+      dir: 'coverage',
+      reporters: [
+        { type: 'html', subdir: 'html' },
+        { type: 'lcov', subdir: 'lcov' }
+      ]
     },
 
     // web server port
