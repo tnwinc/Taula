@@ -2,14 +2,13 @@
   "name": "infinite-table",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/InfiniteTable.js",
   "scripts": {
     "test": "karma start karma.conf.js --single-run --browsers Firefox"
   },
   "author": "Will Stamper",
   "license": "ISC",
-  "dependencies": {
-    "lodash": "^3.10.1",
+  "peerDependencies": {
     "react": "^0.13.3"
   },
   "devDependencies": {

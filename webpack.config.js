@@ -1,10 +1,12 @@
 var path = require('path');
 
 module.exports = {
-  entry: './index.js',
+  entry: './lib/InfiniteTable.js',
   output: {
     path: path.join(__dirname, '/dist'),
     filename: 'InfiniteTable.js',
+    library: 'InfiniteTable',
+    libraryTarget: 'umd'
   },
   eslint: {
     configFile: './.eslintrc.json'
@@ -29,5 +31,23 @@ module.exports = {
         loader: 'babel?optional=runtime'
       }
     ]
-  }
+  },
+  externals: [
+    {
+      'react': {
+        root: 'React',
+        commonjs2: 'react',
+        commonjs: 'react',
+        amd: 'react'
+      }
+    },
+    {
+      'react-dom': {
+        root: 'ReactDOM',
+        commonjs2: 'react-dom',
+        commonjs: 'react-dom',
+        amd: 'react-dom'
+      }
+    }
+  ]
 };
