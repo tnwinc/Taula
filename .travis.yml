@@ -6,7 +6,6 @@ before_install:
   - nvm install stable
   - nvm use stable
 script:
-  - cd services/asset-server/
   - npm install
   - npm test
   - cd -
