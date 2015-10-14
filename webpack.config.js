@@ -22,9 +22,10 @@ module.exports = {
         test: /\.css$/,
         loader: 'style!css'
       },
+      { test: /\.coffee$/, loaders: ['coffee']},
       {
         test: /\.jsx?$/,
-        exclude: /(__tests__|dist|node_modules|bower_components)/,
+        exclude: /(test|dist|node_modules|bower_components)/,
         loader: 'babel?optional=runtime'
       }
     ]

@@ -1,8 +1,9 @@
-jest.dontMock '../lib/InfiniteTable.js'
-
 React = require('react/addons')
 InfiniteTable = require('../lib/InfiniteTable.js')
 DefaultRow = require('../lib/DefaultRow.js')
+
+chai = require 'chai'
+{expect} = chai
 
 {findDOMNode} = React
 {TestUtils} = React.addons
@@ -23,4 +24,4 @@ describe 'InfiniteTable', ->
     )
     @table = shallowRenderer.getRenderOutput()
   it 'renders a row per data item', ->
-    expect(@table.props.children.length).toEqual @data.length
+    expect(@table.props.children.length).to.equal @data.length
