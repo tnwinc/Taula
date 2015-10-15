@@ -35,17 +35,30 @@ const InfiniteTable = React.createClass({
   },
   _renderRow: function _renderRow(datum, index) {
     const Row = this.props.rowComponent;
+    datum.rowIndex = index;
     return (
       <Row data={datum} key={index}/>
     );
   },
   render: function render() {
+    const {headerElement, footerElement, loading, data, loadingMessage, noValuesMessage, colCount} = this.props;
     return (
-      <div>
-      {
-        this.props.data.map(this._renderRow)
-      }
-      </div>
+      <table>
+       <tbody>
+       {(() => {
+          if(loading){
+           return(<tr className='centered-row'><td colSpan={colCount}>{loadingMessage}</td></tr>);
+          }
+          else if (data.length === 0 && noValuesMessage){
+            return(<tr className='centered-row'><td colSpan={colCount}>{noValuesMessage}</td></tr>);
+          }
+          else{
+            return data.map(this._renderRow);
+          }
+        }
+       )()}
+       </tbody>
+      </table>
     );
   },
 });
