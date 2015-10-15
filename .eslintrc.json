@@ -38,6 +38,8 @@
     "strict": 0, // controls location of Use Strict Directives. 0: required by `babel-eslint`
     "no-console": 2,
 
+    "jsx-quotes": [2, "prefer-single"],
+
     "react/display-name": 2, // Prevent missing displayName in a React component definition
     "react/no-danger": 2, // Prevent using dangerous properties
     "react/jsx-no-undef": 2, // Disallow undeclared variables in JSX

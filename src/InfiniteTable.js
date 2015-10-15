@@ -7,8 +7,8 @@ const InfiniteTable = React.createClass({
   propTypes: {
     pageLength: PropTypes.number.isRequired,
     rowComponent: PropTypes.func,
-    headerElement: PropTypes.node,
-    footerElement: PropTypes.node,
+    // headerElement: PropTypes.node,
+    // footerElement: PropTypes.node,
     columns: PropTypes.arrayOf(PropTypes.object),
     colCount: PropTypes.number.isRequired,
     data: PropTypes.arrayOf(PropTypes.shape({
@@ -40,21 +40,18 @@ const InfiniteTable = React.createClass({
     );
   },
   render: function render() {
-    const {headerElement, footerElement, loading, data, loadingMessage, noValuesMessage, colCount} = this.props;
+    const {loading, data, loadingMessage, noValuesMessage, colCount} = this.props;
     return (
       <table ref='table'>
        <tbody ref='body'>
        {(() => {
-          if(loading){
-           return(<tr ref='loading-row' className='centered-row'><td colSpan={colCount}>{loadingMessage}</td></tr>);
-          }
-          else if (data.length === 0 && noValuesMessage){
-            return(<tr ref='no-value-row' className='centered-row'><td colSpan={colCount}>{noValuesMessage}</td></tr>);
-          }
-          else{
-            return data.map(this._renderRow);
-          }
-        }
+         if (loading) {
+           return (<tr ref='loading-row' className='centered-row'><td colSpan={colCount}>{loadingMessage}</td></tr>);
+         } else if (data.length === 0 && noValuesMessage) {
+           return (<tr ref='no-value-row' className='centered-row'><td colSpan={colCount}>{noValuesMessage}</td></tr>);
+         }
+         return data.map(this._renderRow);
+       }
        )()}
        </tbody>
       </table>
