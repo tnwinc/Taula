@@ -21,6 +21,7 @@ describe 'InfiniteTable', ->
     shallowRenderer.render(React.createElement InfiniteTable,
       data: @data
       pageLength: 5
+      colCount: 3
     )
     @table = shallowRenderer.getRenderOutput()
   it 'renders a row per data item', ->
