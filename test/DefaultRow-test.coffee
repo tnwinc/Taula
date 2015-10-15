@@ -6,8 +6,6 @@ DefaultRow  = require '../src/DefaultRow.js'
 chai = require 'chai'
 {expect} = chai
 
-{findDOMNode} = React
-
 shallowRenderer = createRenderer()
 
 describe 'default row', ->
