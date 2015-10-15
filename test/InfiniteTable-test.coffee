@@ -5,18 +5,20 @@ DefaultRow = require('../src/DefaultRow.js')
 chai = require 'chai'
 {expect} = chai
 
-{findDOMNode} = React
+{findDOMNode, Children} = React
 {TestUtils} = React.addons
-{createRenderer} = React.addons.TestUtils
+{createRenderer, scryRenderedComponentsWithType} = React.addons.TestUtils
 
 shallowRenderer = createRenderer()
 
 describe 'InfiniteTable', ->
   beforeEach ->
     @data = [
-      { one: 'one' }
-      { two: 'two' }
-      { three: 'three' }
+      rowData: ['one']
+    ,
+      rowData: ['two']
+    ,
+      rowData: ['three']
     ]
     shallowRenderer.render(React.createElement InfiniteTable,
       data: @data
@@ -24,5 +26,12 @@ describe 'InfiniteTable', ->
       colCount: 3
     )
     @table = shallowRenderer.getRenderOutput()
-  it 'renders a row per data item', ->
-    expect(@table.props.children.length).to.equal @data.length
+    @tbody = Children.only @table.props.children
+  it 'should render a table', ->
+    expect(@table.type).to.equal 'table'
+
+  it 'should render a tbody', ->
+    expect(@tbody.type).to.equal 'tbody'
+
+  it 'should a row per datum', ->
+    expect(Children.count @tbody.props.children).to.equal @data.length
