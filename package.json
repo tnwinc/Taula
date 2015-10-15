@@ -11,7 +11,7 @@
   "author": "Will Stamper",
   "license": "ISC",
   "peerDependencies": {
-    "react": "^0.13.3"
+    "react": "^0.14.0"
   },
   "devDependencies": {
     "babel-core": "^5.8.25",
@@ -35,6 +35,7 @@
     "karma-mocha-reporter": "^1.1.1",
     "karma-webpack": "^1.7.0",
     "mocha": "^2.3.3",
+    "react-addons-test-utils": "^0.14.0",
     "sinon": "^1.17.1",
     "sinon-chai": "^2.8.0",
     "webpack": "^1.12.2"

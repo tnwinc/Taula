@@ -1,13 +1,12 @@
 
-React = require 'react/addons'
+React = require 'react'
+{createRenderer} = require 'react-addons-test-utils'
 DefaultRow  = require '../src/DefaultRow.js'
 
 chai = require 'chai'
 {expect} = chai
 
 {findDOMNode} = React
-{TestUtils} = React.addons
-{createRenderer} = React.addons.TestUtils
 
 shallowRenderer = createRenderer()
 
@@ -22,4 +21,3 @@ describe 'default row', ->
         rowIndex: 0
       )
       @table = shallowRenderer.getRenderOutput()
-
