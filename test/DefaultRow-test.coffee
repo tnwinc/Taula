@@ -1,6 +1,6 @@
 
 React = require 'react/addons'
-DefaultRow  = require '../lib/DefaultRow.js'
+DefaultRow  = require '../src/DefaultRow.js'
 {findDOMNode} = React
 {TestUtils} = React.addons
 {renderIntoDocument, findRenderedDOMComponentWithTag} = TestUtils

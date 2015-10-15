@@ -1,7 +1,7 @@
 var path = require('path');
 
 module.exports = {
-  entry: './lib/InfiniteTable.js',
+  entry: './src/InfiniteTable.js',
   output: {
     path: path.join(__dirname, '/dist'),
     filename: 'InfiniteTable.js',
@@ -15,7 +15,7 @@ module.exports = {
     preLoaders: [
       {
         test: /\.jsx?$/,
-        include: path.join(__dirname, 'lib'),
+        include: path.join(__dirname, 'src'),
         loader: 'eslint-loader'
       }
     ],

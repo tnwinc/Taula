@@ -1,6 +1,6 @@
 React = require('react/addons')
-InfiniteTable = require('../lib/InfiniteTable.js')
-DefaultRow = require('../lib/DefaultRow.js')
+InfiniteTable = require('../src/InfiniteTable.js')
+DefaultRow = require('../src/DefaultRow.js')
 
 chai = require 'chai'
 {expect} = chai
