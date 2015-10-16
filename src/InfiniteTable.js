@@ -4,6 +4,9 @@ const {PropTypes} = React;
 
 const $ = require('jquery');
 
+const PRELOAD_PAGES = 1;
+const MAX_PAGES = 1 + 2 * PRELOAD_PAGES;
+
 const InfiniteTable = React.createClass({
   displayName: 'InfiniteTable',
   propTypes: {
@@ -33,12 +36,12 @@ const InfiniteTable = React.createClass({
   getInitialState: function getInitialState() {
     return {
       topChunk: 0,
-      bottomChunk: 2,
+      bottomChunk: MAX_PAGES - 1,
       initialLoading: true,
     };
   },
   componentDidMount: function componentDidMount() {
-    this.props.loadData(0, this.props.pageLength * 3);
+    this.props.loadData(0, this.props.pageLength * MAX_PAGES);
   },
   componentDidUpdate: function componentDidUpdate() {
     // if (prevState.topIndex !== this.state.topIndex || prevState.bottomIndex !== this.state.bottomIndex) {
@@ -52,18 +55,21 @@ const InfiniteTable = React.createClass({
     this.setState(this.getInitialState());
   },
   findVisibleChunks: function findVisibleChunks() {
-    const tbody = $(this.refs.body);
-    const scrollTop = tbody.scrollTop();
-    const scrollBottom = scrollTop + tbody.height();
-    const rows = tbody.children('tr');
+    const table = $(this.refs.table);
+    const tableTop = table.offset().top;
+    const scrollTop = table.scrollTop();
+    const scrollBottom = scrollTop + table.height();
+    const rows = table.find('tbody tr');
+    const headHeight = table.find('thead').height();
     const visibleChunks = [];
     for (let chunkIndex = 0; chunkIndex <= this.state.bottomChunk - this.state.topChunk; chunkIndex++) {
-      const firstRow = rows[chunkIndex * this.props.pageLength];
-      const chunkTop = firstRow.scrollTop();
+      const firstRow = rows.eq(chunkIndex * this.props.pageLength);
+      const chunkTop = firstRow.offset().top - tableTop - headHeight;
       if (chunkTop >= scrollTop && chunkTop <= scrollBottom) {
         visibleChunks.push(chunkIndex);
       }
     }
+    console.dir(visibleChunks);
     return visibleChunks;
   },
   handleScroll: function handleScroll() {
@@ -72,13 +78,13 @@ const InfiniteTable = React.createClass({
     const visibleChunks = this.findVisibleChunks();
     // How to handle telling when there's no more to scroll?
     if (visibleChunks[visibleChunks.length - 1] >= bottomChunk) {
-      loadData((bottomChunk + 1) * pageLength, (bottomChunk + 2) * pageLength);
+      loadData((topChunk + 1) * pageLength, (bottomChunk + 2) * pageLength);
       this.setState({
         topChunk: topChunk + 1,
         bottomChunk: bottomChunk + 1,
       });
     } else if (topChunk > 0 && visibleChunks[0] <= topChunk) {
-      loadData((topChunk - 1) * pageLength, (topChunk - 0) * pageLength);
+      loadData((topChunk - 1) * pageLength, bottomChunk * pageLength);
       this.setState({
         topChunk: topChunk - 1,
         bottomChunk: bottomChunk - 1,
@@ -92,13 +98,20 @@ const InfiniteTable = React.createClass({
       <Row {...datum} rowIndex={index} key={index}/>
     );
   },
+  _renderRows: function _renderRows() {
+    const rows = [];
+    const firstRow = 0;
+    const lastRow = MAX_PAGES * this.props.pageLength;
+    for (let rowIndex = firstRow; rowIndex < lastRow; rowIndex++) {
+      rows.push(this._renderRow(this.props.data[rowIndex], rowIndex));
+    }
+    return rows;
+  },
   render: function render() {
     const {headerElement, footerElement, loading, data, loadingMessage, noValuesMessage, colCount} = this.props;
     return (
       <table ref='table' onScroll={this.handleScroll}>
-       <thead>
-         { headerElement }
-       </thead>
+       { headerElement }
        <tbody ref='body'>
        {(() => {
          if (loading) {
@@ -106,13 +119,11 @@ const InfiniteTable = React.createClass({
          } else if (data.length === 0 && noValuesMessage) {
            return (<tr ref='no-value-row' className='centered-row'><td colSpan={colCount}>{noValuesMessage}</td></tr>);
          }
-         return data.map(this._renderRow);
+         return this._renderRows();
        }
        )()}
        </tbody>
-       <tfoot>
-         { footerElement }
-       </tfoot>
+       { footerElement }
       </table>
     );
   },
