@@ -41,6 +41,7 @@
     "webpack": "^1.12.2"
   },
   "dependencies": {
-    "babel-runtime": "^5.8.25"
+    "babel-runtime": "^5.8.25",
+    "jquery": "^2.1.4"
   }
 }
