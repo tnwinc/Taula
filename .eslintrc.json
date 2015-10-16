@@ -15,6 +15,7 @@
   "extends": "airbnb",
 
   "rules": {
+    "id-length": 0,
     "comma-dangle": 2, // disallow or enforce trailing commas
     "no-constant-condition": 2, // disallow use of constant expressions in conditions
     "no-control-regex": 2, // disallow control characters in regular expressions
