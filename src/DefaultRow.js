@@ -11,7 +11,7 @@ const DefaultRow = React.createClass({
     rowIndex: PropTypes.number.isRequired,
   },
   _renderCell: function _renderCell(cellData, index) {
-    return (<td ref='renderedCell' key={index} colSpan={this.props.colSpanOverride}>{cellData}</td>);
+    return (<td key={index} colSpan={this.props.colSpanOverride}>{cellData}</td>);
   },
   render: function render() {
     const {rowData, rowClass, rowIndex} = this.props;
