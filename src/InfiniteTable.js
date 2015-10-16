@@ -17,7 +17,6 @@ const InfiniteTable = React.createClass({
       rowClass: PropTypes.string,
       colSpanOverride: PropTypes.number,
     })).isRequired,
-    RowComponent: PropTypes.func,
     loading: PropTypes.bool,
     loadingMessage: PropTypes.node,
     noValuesMessage: PropTypes.node,
