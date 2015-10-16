@@ -28,7 +28,8 @@ describe 'InfiniteTable', ->
         noValuesMessage: 'NODATA'
       )
       @table = shallowRenderer.getRenderOutput()
-      @tbody = Children.only @table.props.children
+      @tbody = Children.toArray(@table.props.children)[1]
+
     it 'should render a table', ->
       expect(@table.type).to.equal 'table'
 
@@ -49,7 +50,7 @@ describe 'InfiniteTable', ->
         colCount: 3
       )
       @table = shallowRenderer.getRenderOutput()
-      @tbody = Children.only @table.props.children
+      @tbody = Children.toArray(@table.props.children)[1]
       @messageRow = Children.only @tbody.props.children
       @messageCell = Children.only @messageRow.props.children
 
@@ -71,7 +72,7 @@ describe 'InfiniteTable', ->
         colCount: 3
       )
       @table = shallowRenderer.getRenderOutput()
-      @tbody = Children.only @table.props.children
+      @tbody = Children.toArray(@table.props.children)[1]
       @messageRow = Children.only @tbody.props.children
       @messageCell = Children.only @messageRow.props.children
 
@@ -80,3 +81,49 @@ describe 'InfiniteTable', ->
 
     it 'should not show any other rows', ->
       expect(Children.count @tbody.props.children).to.equal 1
+
+  describe 'when a header element is passed in', ->
+    beforeEach ->
+      @data = [
+        rowData: ['one']
+      ,
+        rowData: ['two']
+      ,
+        rowData: ['three']
+      ]
+      shallowRenderer.render(React.createElement InfiniteTable,
+        data: @data
+        pageLength: 5
+        colCount: 3
+        headerElement: 'IAMAHEADER'
+        loadingMessage: 'LOADING'
+        noValuesMessage: 'NODATA'
+      )
+      @table = shallowRenderer.getRenderOutput()
+      @thead = Children.toArray(@table.props.children)[0]
+
+    it 'should render the header element', ->
+      expect(@thead.props.children).to.equal 'IAMAHEADER'
+
+  describe 'when a header element is passed in', ->
+    beforeEach ->
+      @data = [
+        rowData: ['one']
+      ,
+        rowData: ['two']
+      ,
+        rowData: ['three']
+      ]
+      shallowRenderer.render(React.createElement InfiniteTable,
+        data: @data
+        pageLength: 5
+        colCount: 3
+        footerElement: 'IAMAFOOTER'
+        loadingMessage: 'LOADING'
+        noValuesMessage: 'NODATA'
+      )
+      @table = shallowRenderer.getRenderOutput()
+      @tfoot = Children.toArray(@table.props.children)[2]
+
+    it 'should render the footer element', ->
+      expect(@tfoot.props.children).to.equal 'IAMAFOOTER'

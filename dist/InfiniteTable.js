@@ -67,7 +67,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    pageLength: PropTypes.number.isRequired,
 	    rowComponent: PropTypes.func,
 	    headerElement: PropTypes.node,
-	    footerElement: PropTypes.node,
+	    // footerElement: PropTypes.node,
 	    columns: PropTypes.arrayOf(PropTypes.object),
 	    colCount: PropTypes.number.isRequired,
 	    data: PropTypes.arrayOf(PropTypes.shape({
@@ -76,7 +76,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      rowClass: PropTypes.string,
 	      colSpanOverride: PropTypes.number
 	    })).isRequired,
-	    RowComponent: PropTypes.func,
 	    loading: PropTypes.bool,
 	    loadingMessage: PropTypes.node,
 	    noValuesMessage: PropTypes.node
@@ -101,7 +100,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var _props = this.props;
 	    var headerElement = _props.headerElement;
-	    var footerElement = _props.footerElement;
 	    var loading = _props.loading;
 	    var data = _props.data;
 	    var loadingMessage = _props.loadingMessage;
@@ -111,6 +109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return React.createElement(
 	      'table',
 	      { ref: 'table' },
+	      headerElement ? headerElement : undefined,
 	      React.createElement(
 	        'tbody',
 	        { ref: 'body' },
@@ -135,9 +134,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                noValuesMessage
 	              )
 	            );
-	          } else {
-	            return data.map(_this._renderRow);
 	          }
+	          return data.map(_this._renderRow);
 	        })()
 	      )
 	    );

@@ -7,8 +7,8 @@ const InfiniteTable = React.createClass({
   propTypes: {
     pageLength: PropTypes.number.isRequired,
     rowComponent: PropTypes.func,
-    // headerElement: PropTypes.node,
-    // footerElement: PropTypes.node,
+    headerElement: PropTypes.node,
+    footerElement: PropTypes.node,
     columns: PropTypes.arrayOf(PropTypes.object),
     colCount: PropTypes.number.isRequired,
     data: PropTypes.arrayOf(PropTypes.shape({
@@ -39,9 +39,12 @@ const InfiniteTable = React.createClass({
     );
   },
   render: function render() {
-    const {loading, data, loadingMessage, noValuesMessage, colCount} = this.props;
+    const {headerElement, footerElement, loading, data, loadingMessage, noValuesMessage, colCount} = this.props;
     return (
       <table ref='table'>
+       <thead>
+         { headerElement }
+       </thead>
        <tbody ref='body'>
        {(() => {
          if (loading) {
@@ -53,6 +56,9 @@ const InfiniteTable = React.createClass({
        }
        )()}
        </tbody>
+       <tfoot>
+         { footerElement }
+       </tfoot>
       </table>
     );
   },
