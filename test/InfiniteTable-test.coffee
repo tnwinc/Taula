@@ -4,7 +4,13 @@ DefaultRow = require '../src/DefaultRow.js'
 {createRenderer, scryRenderedComponentsWithType} = require 'react-addons-test-utils'
 
 chai = require 'chai'
+sinon = require 'sinon'
+sinonChai = require 'sinon-chai'
+chai.use sinonChai
+
 {expect} = chai
+stub = sinon.stub
+
 
 {Children} = React
 
@@ -36,7 +42,7 @@ describe 'InfiniteTable', ->
     it 'should render a tbody', ->
       expect(@tbody.type).to.equal 'tbody'
 
-    it 'should a row per datum', ->
+    it 'should render a row per datum', ->
       expect(Children.count @tbody.props.children).to.equal @data.length
 
   describe 'when the initial load is happening', ->
@@ -127,3 +133,34 @@ describe 'InfiniteTable', ->
 
     it 'should render the footer element', ->
       expect(@tfoot.props.children).to.equal 'IAMAFOOTER'
+
+  describe 'when a custom renderer is passed in', ->
+    beforeEach ->
+      @data = [
+        rowData: ['one']
+      ,
+        rowData: ['two']
+      ,
+        rowData: ['three']
+      ]
+      @customThing = React.DOM.tr
+      shallowRenderer.render(React.createElement InfiniteTable,
+        data: @data
+        pageLength: 5
+        colCount: 3
+        loadingMessage: 'LOADING'
+        noValuesMessage: 'NODATA'
+        rowComponent: @customThing
+      )
+      @table = shallowRenderer.getRenderOutput()
+      @tbody = Children.toArray(@table.props.children)[1]
+
+    it 'should render a table', ->
+      expect(@table.type).to.equal 'table'
+
+    it 'should render a tbody', ->
+      expect(@tbody.type).to.equal 'tbody'
+
+    it 'should render a row per datum', ->
+      expect(Children.count @tbody.props.children).to.equal @data.length
+      expect(Children.toArray(@tbody.props.children)[0].type).to.equal @customThing
