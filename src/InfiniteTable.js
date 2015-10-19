@@ -37,16 +37,18 @@ const InfiniteTable = React.createClass({
     return {
       topChunk: 0,
       bottomChunk: MAX_PAGES - 1,
+      hiddenTop: 0,
+      hiddenBottom: 0,
       initialLoading: true,
     };
   },
   componentDidMount: function componentDidMount() {
     this.props.loadData(0, this.props.pageLength * MAX_PAGES);
   },
-  componentDidUpdate: function componentDidUpdate() {
-    // if (prevState.topIndex !== this.state.topIndex || prevState.bottomIndex !== this.state.bottomIndex) {
-    //   this.scrollToIndex();
-    // }
+  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
+    if (prevState.topChunk !== this.state.topChunk || prevState.bottomChunk !== this.state.bottomChunk) {
+      this._handleChunkUpdate(prevState);
+    }
   },
   scrollToIndex: function scrollToIndex() {
     // implement later
@@ -54,13 +56,23 @@ const InfiniteTable = React.createClass({
   resetData: function resetData() {
     this.setState(this.getInitialState());
   },
-  findVisibleChunks: function findVisibleChunks() {
+  _calculateChunkHeight: function _calculateChunkHeight(index) {
+    const rows = $(this.refs.body).find('tr');
+    // offset for hidden trs?
+    const firstRow = index * this.props.pageLength;
+    const lastRow = (index + 1) * this.props.pageLength;
+    let sum = 0;
+    for (let rowIndex = firstRow; rowIndex < lastRow; rowIndex++) {
+      sum += rows.eq(rowIndex).height();
+    }
+    return sum;
+  },
+  _findVisibleChunks: function findVisibleChunks() {
     const table = $(this.refs.table);
-    const tbody = table.find('tbody');
     const tableTop = table.offset().top;
     const scrollTop = table.scrollTop();
     const scrollBottom = scrollTop + table.height();
-    const rows = tbody.find('tr');
+    const rows = table.find('tbody tr');
     const headHeight = table.find('thead').height();
     const visibleChunks = [];
     const lastChunk = this.state.bottomChunk - this.state.topChunk;
@@ -88,10 +100,24 @@ const InfiniteTable = React.createClass({
     }
     return visibleChunks;
   },
+  _handleChunkUpdate: function _handleChunkUpdate(prevState) {
+    const prevTopChunk = prevState.topChunk;
+    const {topChunk, hiddenTop} = this.state;
+    let newHeight = hiddenTop;
+    console.info('checking chunks');
+    for (let chunkIndex = prevTopChunk; chunkIndex < topChunk; chunkIndex++) {
+      console.info(chunkIndex);
+      newHeight += this._calculateChunkHeight(chunkIndex);
+    }
+    console.info('setting ', newHeight);
+    this.setState({
+      hiddenTop: newHeight,
+    });
+  },
   handleScroll: function handleScroll() {
     const {pageLength, loadData} = this.props;
     const {topChunk, bottomChunk} = this.state;
-    const visibleChunks = this.findVisibleChunks();
+    const visibleChunks = this._findVisibleChunks();
     // How to handle telling when there's no more to scroll?
     if (visibleChunks[visibleChunks.length - 1] >= bottomChunk) {
       loadData((topChunk + 1) * pageLength, (bottomChunk + 2) * pageLength);
@@ -118,6 +144,12 @@ const InfiniteTable = React.createClass({
     const rows = [];
     const firstRow = 0;
     const lastRow = MAX_PAGES * this.props.pageLength;
+    const {hiddenTop} = this.state;
+    if (hiddenTop > 0) {
+      rows.push(
+        <tr key='hiddenTop' style={{height: hiddenTop + 'px'}} />
+      );
+    }
     for (let rowIndex = firstRow; rowIndex < lastRow; rowIndex++) {
       rows.push(this._renderRow(this.props.data[rowIndex], rowIndex));
     }
