@@ -107,7 +107,6 @@ const InfiniteTable = React.createClass({
     for (let chunkIndex = prevTopChunk; chunkIndex < topChunk; chunkIndex++) {
       newHeight += this._calculateChunkHeight(chunkIndex);
     }
-    for (let chunkIndex = prevTopChunk; chunkIndex > topChunk;)
     this.setState({
       hiddenTop: newHeight,
     });

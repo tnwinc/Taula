@@ -63,6 +63,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var $ = __webpack_require__(18);
 
+	var PRELOAD_PAGES = 2;
+	var MAX_PAGES = 1 + 2 * PRELOAD_PAGES;
+
 	var InfiniteTable = React.createClass({
 	  displayName: 'InfiniteTable',
 	  propTypes: {
@@ -92,17 +95,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getInitialState: function getInitialState() {
 	    return {
 	      topChunk: 0,
-	      bottomChunk: 2,
+	      bottomChunk: MAX_PAGES - 1,
+	      hiddenTop: 0,
+	      hiddenBottom: 0,
 	      initialLoading: true
 	    };
 	  },
 	  componentDidMount: function componentDidMount() {
-	    this.props.loadData(0, this.props.pageLength * 3);
+	    this.props.loadData(0, this.props.pageLength * MAX_PAGES);
 	  },
-	  componentDidUpdate: function componentDidUpdate() {
-	    // if (prevState.topIndex !== this.state.topIndex || prevState.bottomIndex !== this.state.bottomIndex) {
-	    //   this.scrollToIndex();
-	    // }
+	  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
+	    if (prevState.topChunk !== this.state.topChunk || prevState.bottomChunk !== this.state.bottomChunk) {
+	      this._handleChunkUpdate(prevState);
+	    }
 	  },
 	  scrollToIndex: function scrollToIndex() {
 	    // implement later
@@ -110,39 +115,82 @@ return /******/ (function(modules) { // webpackBootstrap
 	  resetData: function resetData() {
 	    this.setState(this.getInitialState());
 	  },
-	  findVisibleChunks: function findVisibleChunks() {
-	    var tbody = $(this.refs.body);
-	    var scrollTop = tbody.scrollTop();
-	    var scrollBottom = scrollTop + tbody.height();
-	    var rows = tbody.children('tr');
+	  _calculateChunkHeight: function _calculateChunkHeight(index) {
+	    var rows = $(this.refs.body).find('tr');
+	    // offset for hidden trs?
+	    var firstRow = index * this.props.pageLength;
+	    var lastRow = (index + 1) * this.props.pageLength;
+	    var sum = 0;
+	    for (var rowIndex = firstRow; rowIndex < lastRow; rowIndex++) {
+	      sum += rows.eq(rowIndex).height();
+	    }
+	    return sum;
+	  },
+	  _findVisibleChunks: function findVisibleChunks() {
+	    var table = $(this.refs.table);
+	    var tableTop = table.offset().top;
+	    var scrollTop = table.scrollTop();
+	    var scrollBottom = scrollTop + table.height();
+	    var rows = table.find('tbody tr');
+	    var headHeight = table.find('thead').height();
 	    var visibleChunks = [];
-	    for (var chunkIndex = 0; chunkIndex <= this.state.bottomChunk - this.state.topChunk; chunkIndex++) {
-	      var firstRow = rows[chunkIndex * this.props.pageLength];
-	      var chunkTop = firstRow.scrollTop();
-	      if (chunkTop >= scrollTop && chunkTop <= scrollBottom) {
-	        visibleChunks.push(chunkIndex);
+	    var lastChunk = this.state.bottomChunk - this.state.topChunk;
+	    for (var chunkIndex = 0; chunkIndex <= lastChunk; chunkIndex++) {
+	      var firstRow = rows.eq(chunkIndex * this.props.pageLength);
+	      var chunkTop = firstRow.offset().top - tableTop - headHeight;
+	      var topOfChunkVisible = chunkTop >= scrollTop && chunkTop <= scrollBottom;
+	      var topOfChunkOffBottom = chunkTop > scrollBottom;
+	      if (topOfChunkVisible) {
+	        if (chunkIndex === 0) {
+	          visibleChunks.push(chunkIndex);
+	        } else if (chunkIndex === lastChunk) {
+	          visibleChunks.push(chunkIndex - 1);
+	          visibleChunks.push(chunkIndex);
+	        } else {
+	          visibleChunks.push(chunkIndex - 1);
+	        }
+	      } else if (topOfChunkOffBottom) {
+	        visibleChunks.push(chunkIndex - 1);
+	        break;
 	      }
 	    }
+	    if (visibleChunks.length === 0) {
+	      visibleChunks.push(lastChunk);
+	    }
 	    return visibleChunks;
+	  },
+	  _handleChunkUpdate: function _handleChunkUpdate(prevState) {
+	    var prevTopChunk = prevState.topChunk;
+	    var _state = this.state;
+	    var topChunk = _state.topChunk;
+	    var hiddenTop = _state.hiddenTop;
+
+	    var newHeight = hiddenTop;
+	    for (var chunkIndex = prevTopChunk; chunkIndex < topChunk; chunkIndex++) {
+	      newHeight += this._calculateChunkHeight(chunkIndex);
+	    }
+	    this.setState({
+	      hiddenTop: newHeight
+	    });
 	  },
 	  handleScroll: function handleScroll() {
 	    var _props = this.props;
 	    var pageLength = _props.pageLength;
 	    var loadData = _props.loadData;
-	    var _state = this.state;
-	    var topChunk = _state.topChunk;
-	    var bottomChunk = _state.bottomChunk;
+	    var _state2 = this.state;
+	    var topChunk = _state2.topChunk;
+	    var bottomChunk = _state2.bottomChunk;
 
-	    var visibleChunks = this.findVisibleChunks();
+	    var visibleChunks = this._findVisibleChunks();
 	    // How to handle telling when there's no more to scroll?
 	    if (visibleChunks[visibleChunks.length - 1] >= bottomChunk) {
-	      loadData((bottomChunk + 1) * pageLength, (bottomChunk + 2) * pageLength);
+	      loadData((topChunk + 1) * pageLength, (bottomChunk + 2) * pageLength);
 	      this.setState({
 	        topChunk: topChunk + 1,
 	        bottomChunk: bottomChunk + 1
 	      });
 	    } else if (topChunk > 0 && visibleChunks[0] <= topChunk) {
-	      loadData((topChunk - 1) * pageLength, (topChunk - 0) * pageLength);
+	      loadData((topChunk - 1) * pageLength, bottomChunk * pageLength);
 	      this.setState({
 	        topChunk: topChunk - 1,
 	        bottomChunk: bottomChunk - 1
@@ -153,6 +201,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _renderRow: function _renderRow(datum, index) {
 	    var Row = this.props.rowComponent;
 	    return React.createElement(Row, _extends({}, datum, { rowIndex: index, key: index }));
+	  },
+	  _renderRows: function _renderRows() {
+	    var rows = [];
+	    var firstRow = 0;
+	    var lastRow = MAX_PAGES * this.props.pageLength;
+	    var hiddenTop = this.state.hiddenTop;
+
+	    if (hiddenTop > 0) {
+	      rows.push(React.createElement('tr', { key: 'hiddenTop', style: { height: hiddenTop + 'px' } }));
+	    }
+	    for (var rowIndex = firstRow; rowIndex < lastRow && rowIndex < this.props.data.length; rowIndex++) {
+	      rows.push(this._renderRow(this.props.data[rowIndex], rowIndex));
+	    }
+	    return rows;
 	  },
 	  render: function render() {
 	    var _this = this;
@@ -169,11 +231,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return React.createElement(
 	      'table',
 	      { ref: 'table', onScroll: this.handleScroll },
-	      React.createElement(
-	        'thead',
-	        null,
-	        headerElement
-	      ),
+	      headerElement,
 	      React.createElement(
 	        'tbody',
 	        { ref: 'body' },
@@ -199,14 +257,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	              )
 	            );
 	          }
-	          return data.map(_this._renderRow);
+	          return _this._renderRows();
 	        })()
 	      ),
-	      React.createElement(
-	        'tfoot',
-	        null,
-	        footerElement
-	      )
+	      footerElement
 	    );
 	  }
 	});
