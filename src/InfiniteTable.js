@@ -4,7 +4,7 @@ const {PropTypes} = React;
 
 const $ = require('jquery');
 
-const PRELOAD_PAGES = 1;
+const PRELOAD_PAGES = 2;
 const MAX_PAGES = 1 + 2 * PRELOAD_PAGES;
 
 const InfiniteTable = React.createClass({
@@ -56,20 +56,36 @@ const InfiniteTable = React.createClass({
   },
   findVisibleChunks: function findVisibleChunks() {
     const table = $(this.refs.table);
+    const tbody = table.find('tbody');
     const tableTop = table.offset().top;
     const scrollTop = table.scrollTop();
     const scrollBottom = scrollTop + table.height();
-    const rows = table.find('tbody tr');
+    const rows = tbody.find('tr');
     const headHeight = table.find('thead').height();
     const visibleChunks = [];
-    for (let chunkIndex = 0; chunkIndex <= this.state.bottomChunk - this.state.topChunk; chunkIndex++) {
+    const lastChunk = this.state.bottomChunk - this.state.topChunk;
+    for (let chunkIndex = 0; chunkIndex <= lastChunk; chunkIndex++) {
       const firstRow = rows.eq(chunkIndex * this.props.pageLength);
       const chunkTop = firstRow.offset().top - tableTop - headHeight;
-      if (chunkTop >= scrollTop && chunkTop <= scrollBottom) {
-        visibleChunks.push(chunkIndex);
+      const topOfChunkVisible = chunkTop >= scrollTop && chunkTop <= scrollBottom;
+      const topOfChunkOffBottom = chunkTop > scrollBottom;
+      if (topOfChunkVisible) {
+        if (chunkIndex === 0) {
+          visibleChunks.push(chunkIndex);
+        } else if (chunkIndex === lastChunk) {
+          visibleChunks.push(chunkIndex - 1);
+          visibleChunks.push(chunkIndex);
+        } else {
+          visibleChunks.push(chunkIndex - 1);
+        }
+      } else if (topOfChunkOffBottom) {
+        visibleChunks.push(chunkIndex - 1);
+        break;
       }
     }
-    console.dir(visibleChunks);
+    if (visibleChunks.length === 0) {
+      visibleChunks.push(lastChunk);
+    }
     return visibleChunks;
   },
   handleScroll: function handleScroll() {
