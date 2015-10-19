@@ -104,12 +104,10 @@ const InfiniteTable = React.createClass({
     const prevTopChunk = prevState.topChunk;
     const {topChunk, hiddenTop} = this.state;
     let newHeight = hiddenTop;
-    console.info('checking chunks');
     for (let chunkIndex = prevTopChunk; chunkIndex < topChunk; chunkIndex++) {
-      console.info(chunkIndex);
       newHeight += this._calculateChunkHeight(chunkIndex);
     }
-    console.info('setting ', newHeight);
+    for (let chunkIndex = prevTopChunk; chunkIndex > topChunk;)
     this.setState({
       hiddenTop: newHeight,
     });
@@ -150,7 +148,7 @@ const InfiniteTable = React.createClass({
         <tr key='hiddenTop' style={{height: hiddenTop + 'px'}} />
       );
     }
-    for (let rowIndex = firstRow; rowIndex < lastRow; rowIndex++) {
+    for (let rowIndex = firstRow; rowIndex < lastRow && rowIndex < this.props.data.length; rowIndex++) {
       rows.push(this._renderRow(this.props.data[rowIndex], rowIndex));
     }
     return rows;

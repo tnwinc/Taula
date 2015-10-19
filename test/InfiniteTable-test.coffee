@@ -32,9 +32,10 @@ describe 'InfiniteTable', ->
         colCount: 3
         loadingMessage: 'LOADING'
         noValuesMessage: 'NODATA'
+        bulkLoad: true
       )
       @table = shallowRenderer.getRenderOutput()
-      @tbody = Children.toArray(@table.props.children)[1]
+      @tbody = Children.toArray(@table.props.children)[0]
 
     it 'should render a table', ->
       expect(@table.type).to.equal 'table'
@@ -56,7 +57,7 @@ describe 'InfiniteTable', ->
         colCount: 3
       )
       @table = shallowRenderer.getRenderOutput()
-      @tbody = Children.toArray(@table.props.children)[1]
+      @tbody = Children.toArray(@table.props.children)[0]
       @messageRow = Children.only @tbody.props.children
       @messageCell = Children.only @messageRow.props.children
 
@@ -78,7 +79,7 @@ describe 'InfiniteTable', ->
         colCount: 3
       )
       @table = shallowRenderer.getRenderOutput()
-      @tbody = Children.toArray(@table.props.children)[1]
+      @tbody = Children.toArray(@table.props.children)[0]
       @messageRow = Children.only @tbody.props.children
       @messageCell = Children.only @messageRow.props.children
 
@@ -109,7 +110,7 @@ describe 'InfiniteTable', ->
       @thead = Children.toArray(@table.props.children)[0]
 
     it 'should render the header element', ->
-      expect(@thead.props.children).to.equal 'IAMAHEADER'
+      expect(@thead).to.equal 'IAMAHEADER'
 
   describe 'when a header element is passed in', ->
     beforeEach ->
@@ -129,10 +130,10 @@ describe 'InfiniteTable', ->
         noValuesMessage: 'NODATA'
       )
       @table = shallowRenderer.getRenderOutput()
-      @tfoot = Children.toArray(@table.props.children)[2]
+      @tfoot = Children.toArray(@table.props.children)[1]
 
     it 'should render the footer element', ->
-      expect(@tfoot.props.children).to.equal 'IAMAFOOTER'
+      expect(@tfoot).to.equal 'IAMAFOOTER'
 
   describe 'when a custom renderer is passed in', ->
     beforeEach ->
@@ -153,7 +154,7 @@ describe 'InfiniteTable', ->
         rowComponent: @customThing
       )
       @table = shallowRenderer.getRenderOutput()
-      @tbody = Children.toArray(@table.props.children)[1]
+      @tbody = Children.toArray(@table.props.children)[0]
 
     it 'should render a table', ->
       expect(@table.type).to.equal 'table'
