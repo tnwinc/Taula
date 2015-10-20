@@ -22,7 +22,7 @@ const InfiniteTable = React.createClass({
       rowClass: PropTypes.string,
       colSpanOverride: PropTypes.number,
     })).isRequired,
-    loading: PropTypes.bool,
+    // loading: PropTypes.bool,
     loadingMessage: PropTypes.node,
     noValuesMessage: PropTypes.node,
     bulkLoad: PropTypes.bool,
@@ -45,9 +45,14 @@ const InfiniteTable = React.createClass({
   componentDidMount: function componentDidMount() {
     this.props.loadData(0, this.props.pageLength * MAX_PAGES);
   },
-  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
-    if (prevState.topChunk !== this.state.topChunk || prevState.bottomChunk !== this.state.bottomChunk) {
-      this._handleChunkUpdate(prevState);
+  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
+    if (nextProps.data !== this.props.data) {
+      this.setState({
+        initialLoading: false,
+      });
+    }
+    if (nextState.topChunk !== this.state.topChunk || nextState.bottomChunk !== this.state.bottomChunk) {
+      this._handleChunkUpdate(this.state, nextState);
     }
   },
   scrollToIndex: function scrollToIndex() {
@@ -77,7 +82,7 @@ const InfiniteTable = React.createClass({
     const visibleChunks = [];
     const lastChunk = this.state.bottomChunk - this.state.topChunk;
     for (let chunkIndex = 0; chunkIndex <= lastChunk; chunkIndex++) {
-      const firstRow = rows.eq(chunkIndex * this.props.pageLength);
+      const firstRow = rows.eq(chunkIndex * this.props.pageLength + (this.state.topChunk > 0 ? 1 : 0));
       const chunkTop = firstRow.offset().top - tableTop;
       const topOfChunkVisible = chunkTop >= scrollTop && chunkTop <= scrollBottom;
       const topOfChunkOffBottom = chunkTop > scrollBottom;
@@ -100,11 +105,11 @@ const InfiniteTable = React.createClass({
     if (visibleChunks.length === 0) {
       visibleChunks.push(lastChunk);
     }
-    return visibleChunks;
+    return visibleChunks.map(chunkIndex => chunkIndex + this.state.topChunk);
   },
-  _handleChunkUpdate: function _handleChunkUpdate(prevState) {
+  _handleChunkUpdate: function _handleChunkUpdate(prevState, nextState) {
     const prevTopChunk = prevState.topChunk;
-    const {topChunk, hiddenTop} = this.state;
+    const {topChunk, hiddenTop} = nextState;
     let newHeight = hiddenTop;
     for (let chunkIndex = prevTopChunk; chunkIndex < topChunk; chunkIndex++) {
       newHeight += this._calculateChunkHeight(chunkIndex);
@@ -118,17 +123,15 @@ const InfiniteTable = React.createClass({
     const {topChunk, bottomChunk} = this.state;
     const visibleChunks = this._findVisibleChunks();
     // How to handle telling when there's no more to scroll?
-    if (visibleChunks[visibleChunks.length - 1] >= bottomChunk) {
-      loadData((topChunk + 1) * pageLength, (bottomChunk + 2) * pageLength);
+    const newTopChunk = Math.max(visibleChunks[0] - PRELOAD_PAGES, 0);
+    const newBottomChunk = Math.max(visibleChunks[0] + PRELOAD_PAGES, MAX_PAGES);
+    const scrolledDown = visibleChunks[visibleChunks.length - 1] >= bottomChunk;
+    const scrolledUp = topChunk > 0 && visibleChunks[0] <= topChunk;
+    if (scrolledDown || scrolledUp) {
+      loadData(newTopChunk * pageLength, (newBottomChunk + 1) * pageLength);
       this.setState({
-        topChunk: topChunk + 1,
-        bottomChunk: bottomChunk + 1,
-      });
-    } else if (topChunk > 0 && visibleChunks[0] <= topChunk) {
-      loadData((topChunk - 1) * pageLength, bottomChunk * pageLength);
-      this.setState({
-        topChunk: topChunk - 1,
-        bottomChunk: bottomChunk - 1,
+        topChunk: newTopChunk,
+        bottomChunk: newBottomChunk,
       });
     }
     // Handle case where no chunks are visible?
@@ -155,13 +158,13 @@ const InfiniteTable = React.createClass({
     return rows;
   },
   render: function render() {
-    const {headerElement, footerElement, loading, data, loadingMessage, noValuesMessage, colCount} = this.props;
+    const {headerElement, footerElement, data, loadingMessage, noValuesMessage, colCount} = this.props;
     return (
       <table ref='table' onScroll={this.handleScroll}>
        { headerElement }
        <tbody ref='body'>
        {(() => {
-         if (loading) {
+         if (this.state.initialLoading) {
            return (<tr ref='loading-row' className='centered-row'><td colSpan={colCount}>{loadingMessage}</td></tr>);
          } else if (data.length === 0 && noValuesMessage) {
            return (<tr ref='no-value-row' className='centered-row'><td colSpan={colCount}>{noValuesMessage}</td></tr>);
