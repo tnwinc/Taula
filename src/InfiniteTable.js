@@ -69,16 +69,16 @@ const InfiniteTable = React.createClass({
   },
   _findVisibleChunks: function findVisibleChunks() {
     const table = $(this.refs.table);
-    const tableTop = table.offset().top;
-    const scrollTop = table.scrollTop();
+    const tableTop = table.find('tbody').offset().top;
+    const headHeight = table.find('thead').height();
+    const scrollTop = table.scrollTop() - headHeight;
     const scrollBottom = scrollTop + table.height();
     const rows = table.find('tbody tr');
-    const headHeight = table.find('thead').height();
     const visibleChunks = [];
     const lastChunk = this.state.bottomChunk - this.state.topChunk;
     for (let chunkIndex = 0; chunkIndex <= lastChunk; chunkIndex++) {
       const firstRow = rows.eq(chunkIndex * this.props.pageLength);
-      const chunkTop = firstRow.offset().top - tableTop - headHeight;
+      const chunkTop = firstRow.offset().top - tableTop;
       const topOfChunkVisible = chunkTop >= scrollTop && chunkTop <= scrollBottom;
       const topOfChunkOffBottom = chunkTop > scrollBottom;
       if (topOfChunkVisible) {
@@ -91,7 +91,9 @@ const InfiniteTable = React.createClass({
           visibleChunks.push(chunkIndex - 1);
         }
       } else if (topOfChunkOffBottom) {
-        visibleChunks.push(chunkIndex - 1);
+        if (visibleChunks[visibleChunks.length - 1] !== chunkIndex - 1) {
+          visibleChunks.push(chunkIndex - 1);
+        }
         break;
       }
     }

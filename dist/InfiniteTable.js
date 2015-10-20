@@ -128,16 +128,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	  _findVisibleChunks: function findVisibleChunks() {
 	    var table = $(this.refs.table);
-	    var tableTop = table.offset().top;
-	    var scrollTop = table.scrollTop();
+	    var tableTop = table.find('tbody').offset().top;
+	    var headHeight = table.find('thead').height();
+	    var scrollTop = table.scrollTop() - headHeight;
 	    var scrollBottom = scrollTop + table.height();
 	    var rows = table.find('tbody tr');
-	    var headHeight = table.find('thead').height();
 	    var visibleChunks = [];
 	    var lastChunk = this.state.bottomChunk - this.state.topChunk;
 	    for (var chunkIndex = 0; chunkIndex <= lastChunk; chunkIndex++) {
 	      var firstRow = rows.eq(chunkIndex * this.props.pageLength);
-	      var chunkTop = firstRow.offset().top - tableTop - headHeight;
+	      var chunkTop = firstRow.offset().top - tableTop;
 	      var topOfChunkVisible = chunkTop >= scrollTop && chunkTop <= scrollBottom;
 	      var topOfChunkOffBottom = chunkTop > scrollBottom;
 	      if (topOfChunkVisible) {
@@ -150,7 +150,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          visibleChunks.push(chunkIndex - 1);
 	        }
 	      } else if (topOfChunkOffBottom) {
-	        visibleChunks.push(chunkIndex - 1);
+	        if (visibleChunks[visibleChunks.length - 1] !== chunkIndex - 1) {
+	          visibleChunks.push(chunkIndex - 1);
+	        }
 	        break;
 	      }
 	    }
