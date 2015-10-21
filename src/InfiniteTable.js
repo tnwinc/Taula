@@ -96,39 +96,12 @@ const InfiniteTable = React.createClass({
   },
   _findVisibleChunks: function findVisibleChunks() {
     const table = $(this.refs.table);
-    const tableTop = table.find('tbody').offset().top;
-    const headHeight = table.find('thead').height();
-    const scrollTop = table.scrollTop() - headHeight;
-    const scrollBottom = scrollTop + table.height();
-    const rows = table.find('tbody tr');
     const visibleChunks = [];
-    // const lastChunk = this.state.bottomChunk - this.state.topChunk;
     for (let chunkIndex = 0; chunkIndex <= this.state.bottomChunk; chunkIndex++) {
-      if (chunkIndex * this.props.pageLength >= this.props.data.length) {
-        continue;
+      const chunk = this.refs[chunkIndex.toString()];
+      if (chunk && chunk.isVisibleIn(table)) {
+        visibleChunks.push(chunkIndex);
       }
-      const firstRow = rows.eq(chunkIndex * this.props.pageLength);
-      const chunkTop = firstRow.offset().top - tableTop;
-      const topOfChunkVisible = chunkTop >= scrollTop && chunkTop <= scrollBottom;
-      const topOfChunkOffBottom = chunkTop > scrollBottom;
-      if (topOfChunkVisible) {
-        if (chunkIndex === 0) {
-          visibleChunks.push(chunkIndex);
-        } else if (chunkIndex === this.state.bottomChunk) {
-          visibleChunks.push(chunkIndex - 1);
-          visibleChunks.push(chunkIndex);
-        } else {
-          visibleChunks.push(chunkIndex - 1);
-        }
-      } else if (topOfChunkOffBottom) {
-        if (visibleChunks[visibleChunks.length - 1] !== chunkIndex - 1) {
-          visibleChunks.push(chunkIndex - 1);
-        }
-        break;
-      }
-    }
-    if (visibleChunks.length === 0) {
-      visibleChunks.push(this.state.bottomChunk);
     }
     return visibleChunks;
   },
@@ -166,7 +139,7 @@ const InfiniteTable = React.createClass({
     const {rowComponent, pageLength} = this.props;
     return this.state.chunks.map((data, index) => {
       return (
-        <Chunk data={data} key={index} rowComponent={rowComponent} topIndex={index * pageLength} />
+        <Chunk ref={index} data={data} key={index} rowComponent={rowComponent} topIndex={index * pageLength} />
       );
     });
   },
