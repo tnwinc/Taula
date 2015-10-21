@@ -9,6 +9,7 @@ const MAX_PAGES = 1 + 2 * PRELOAD_PAGES;
 
 const Chunk = require('./Chunk');
 const update = require('react-addons-update');
+const debounce = require('lodash.debounce');
 
 const InfiniteTable = React.createClass({
   displayName: 'InfiniteTable',
@@ -45,6 +46,9 @@ const InfiniteTable = React.createClass({
       initialLoading: true,
       chunks: [],
     };
+  },
+  componentWillMount: function componentWillMount() {
+    this.debouncedLoadData = debounce(this.props.loadData, 200);
   },
   componentDidMount: function componentDidMount() {
     this.props.loadData(0, this.props.pageLength * MAX_PAGES);
@@ -100,7 +104,7 @@ const InfiniteTable = React.createClass({
     return visibleChunks;
   },
   handleScroll: function handleScroll() {
-    const {pageLength, loadData} = this.props;
+    const {pageLength} = this.props;
     const {topChunk, bottomChunk} = this.state;
     const visibleChunks = this._findVisibleChunks();
     const newTopChunk = Math.max(visibleChunks[0] - PRELOAD_PAGES, 0);
@@ -109,7 +113,7 @@ const InfiniteTable = React.createClass({
     const scrolledDown = visibleChunks[visibleChunks.length - 1] >= triggeringChunk;
     const scrolledUp = topChunk > 0 && visibleChunks[0] <= topChunk;
     if (scrolledDown || scrolledUp) {
-      loadData(newTopChunk * pageLength, (newBottomChunk + 1) * pageLength);
+      this.debouncedLoadData(newTopChunk * pageLength, (newBottomChunk + 1) * pageLength);
       this.setState({
         topChunk: newTopChunk,
         bottomChunk: newBottomChunk,
