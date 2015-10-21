@@ -14,32 +14,42 @@ const Chunk = React.createClass({
     })).isRequired,
     topIndex: PropTypes.number.isRequired,
     rowComponent: PropTypes.func.isRequired,
+    visible: PropTypes.bool.isRequired,
+    index: PropTypes.number,
   },
   mixins: [PureRenderMixin],
 
+  getInitialState: function getInitialState() {
+    return {
+      height: 0,
+    };
+  },
+
   componentDidMount: function componentDidMount() {
-    this._updateEndRows();
+    this._updateElementCache();
+  },
+
+  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+    if (this.props.visible && !nextProps.visible) {
+      this.setState({
+        height: this.getHeight(),
+      });
+    }
   },
 
   componentDidUpdate: function componentDidUpdate() {
-    this._updateEndRows();
+    this._updateElementCache();
   },
 
   getHeight: function getHeight() {
-    const firstRow = this.firstRow;
-    const lastRow = this.lastRow;
-    const firstRowTop = firstRow.offset().top;
-    const lastRowTop = lastRow.offset().top;
-    const lastRowBottom = lastRowTop + lastRow.height();
-    return lastRowBottom - firstRowTop;
+    return this.props.visible ? this.body.height() : this.state.height;
   },
 
   isVisibleIn: function isVisibleIn(parent) {
     const parentTop = parent.offset().top;
     const parentHeight = parent.height();
-    const firstRow = this.firstRow;
-    const myTop = firstRow.offset().top - parentTop;
-    const myBottom = myTop + this.getHeight();
+    const myTop = this.body.offset().top - parentTop;
+    const myBottom = myTop + (this.props.visible ? this.getHeight() : this.state.height);
     if (myTop >= 0 && myTop <= parentHeight) {
       return true;
     } else if (myBottom >= 0 && myBottom <= parentHeight) {
@@ -50,9 +60,8 @@ const Chunk = React.createClass({
     return false;
   },
 
-  _updateEndRows: function _updateEndRows() {
-    this.firstRow = domFromReact(this.refs['0']);
-    this.lastRow = domFromReact(this.refs[(this.props.data.length - 1).toString()]);
+  _updateElementCache: function _updateEndRows() {
+    this.body = domFromReact(this.refs.body);
   },
 
   _renderRow: function _renderRow(datum, index) {
@@ -62,11 +71,18 @@ const Chunk = React.createClass({
     );
   },
   render: function render() {
+    if (this.props.visible) {
+      return (
+        <tbody ref='body'>
+          {
+            this.props.data.map(this._renderRow)
+          }
+        </tbody>
+      );
+    }
     return (
-      <tbody>
-        {
-          this.props.data.map(this._renderRow)
-        }
+      <tbody ref='body'>
+        <tr style={{'min-height': this.state.height + 'px', display: 'block'}}/>
       </tbody>
     );
   },

@@ -4,7 +4,7 @@ const {PropTypes} = React;
 
 const $ = require('jquery');
 
-const PRELOAD_PAGES = 5;
+const PRELOAD_PAGES = 3;
 const MAX_PAGES = 1 + 2 * PRELOAD_PAGES;
 
 const Chunk = require('./Chunk');
@@ -49,19 +49,13 @@ const InfiniteTable = React.createClass({
   componentDidMount: function componentDidMount() {
     this.props.loadData(0, this.props.pageLength * MAX_PAGES);
   },
-  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate: function componentWillUpdate(nextProps) {
     if (nextProps.data !== this.props.data) {
       this._updateChunkedData(nextProps.data);
       this.setState({
         initialLoading: false,
       });
     }
-    if (nextState.topChunk !== this.state.topChunk || nextState.bottomChunk !== this.state.bottomChunk) {
-      this._handleChunkUpdate(this.state, nextState);
-    }
-  },
-  scrollToIndex: function scrollToIndex() {
-    // implement later
   },
   resetData: function resetData() {
     this.setState(this.getInitialState());
@@ -105,22 +99,10 @@ const InfiniteTable = React.createClass({
     }
     return visibleChunks;
   },
-  _handleChunkUpdate: function _handleChunkUpdate() {
-    // const prevTopChunk = prevState.topChunk;
-    // const {topChunk, hiddenTop} = nextState;
-    // let newHeight = hiddenTop;
-    // for (let chunkIndex = prevTopChunk; chunkIndex < topChunk; chunkIndex++) {
-    //   newHeight += this._calculateChunkHeight(chunkIndex);
-    // }
-    // this.setState({
-    //   hiddenTop: newHeight,
-    // });
-  },
   handleScroll: function handleScroll() {
     const {pageLength, loadData} = this.props;
     const {topChunk, bottomChunk} = this.state;
     const visibleChunks = this._findVisibleChunks();
-    // How to handle telling when there's no more to scroll?
     const newTopChunk = Math.max(visibleChunks[0] - PRELOAD_PAGES, 0);
     const newBottomChunk = Math.max(visibleChunks[0] + PRELOAD_PAGES, MAX_PAGES);
     const triggeringChunk = bottomChunk - Math.floor(PRELOAD_PAGES / 2);
@@ -133,13 +115,14 @@ const InfiniteTable = React.createClass({
         bottomChunk: newBottomChunk,
       });
     }
-    // Handle case where no chunks are visible?
   },
   _renderChunks: function _renderChunks() {
     const {rowComponent, pageLength} = this.props;
+    const {topChunk, bottomChunk} = this.state;
     return this.state.chunks.map((data, index) => {
+      const chunkIsVisible = (index >= topChunk && index <= bottomChunk);
       return (
-        <Chunk ref={index} data={data} key={index} rowComponent={rowComponent} topIndex={index * pageLength} />
+        <Chunk index={index} visible={chunkIsVisible} ref={index} data={data} key={index} rowComponent={rowComponent} topIndex={index * pageLength} />
       );
     });
   },
