@@ -7,6 +7,9 @@ const $ = require('jquery');
 const PRELOAD_PAGES = 5;
 const MAX_PAGES = 1 + 2 * PRELOAD_PAGES;
 
+const Chunk = require('./Chunk');
+const update = require('react-addons-update');
+
 const InfiniteTable = React.createClass({
   displayName: 'InfiniteTable',
   propTypes: {
@@ -40,6 +43,7 @@ const InfiniteTable = React.createClass({
       hiddenTop: 0,
       hiddenBottom: 0,
       initialLoading: true,
+      chunks: [],
     };
   },
   componentDidMount: function componentDidMount() {
@@ -47,6 +51,7 @@ const InfiniteTable = React.createClass({
   },
   componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
     if (nextProps.data !== this.props.data) {
+      this._updateChunkedData(nextProps.data);
       this.setState({
         initialLoading: false,
       });
@@ -60,6 +65,23 @@ const InfiniteTable = React.createClass({
   },
   resetData: function resetData() {
     this.setState(this.getInitialState());
+  },
+  _updateChunkedData: function _updateChunkedData(data) {
+    const chunks = this.state.chunks;
+    const {pageLength} = this.props;
+    const dataChunkCount = Math.ceil(data.length / pageLength);
+    const newChunks = [];
+    for (let chunkIndex = chunks.length; chunkIndex < dataChunkCount; chunkIndex++) {
+      const topIndex = chunkIndex * pageLength;
+      const bottomIndex = (chunkIndex + 1) * pageLength;
+      newChunks.push(data.slice(topIndex, bottomIndex));
+    }
+    const updatedChunks = update(chunks, {
+      $push: newChunks,
+    });
+    this.setState({
+      chunks: updatedChunks,
+    });
   },
   _calculateChunkHeight: function _calculateChunkHeight(index) {
     const rows = $(this.refs.body).find('tr');
@@ -110,13 +132,13 @@ const InfiniteTable = React.createClass({
     }
     return visibleChunks;
   },
-  _handleChunkUpdate: function _handleChunkUpdate(prevState, nextState) {
-    const prevTopChunk = prevState.topChunk;
-    const {topChunk, hiddenTop} = nextState;
-    let newHeight = hiddenTop;
-    for (let chunkIndex = prevTopChunk; chunkIndex < topChunk; chunkIndex++) {
-      newHeight += this._calculateChunkHeight(chunkIndex);
-    }
+  _handleChunkUpdate: function _handleChunkUpdate() {
+    // const prevTopChunk = prevState.topChunk;
+    // const {topChunk, hiddenTop} = nextState;
+    // let newHeight = hiddenTop;
+    // for (let chunkIndex = prevTopChunk; chunkIndex < topChunk; chunkIndex++) {
+    //   newHeight += this._calculateChunkHeight(chunkIndex);
+    // }
     // this.setState({
     //   hiddenTop: newHeight,
     // });
@@ -140,36 +162,28 @@ const InfiniteTable = React.createClass({
     }
     // Handle case where no chunks are visible?
   },
-  _renderRow: function _renderRow(datum, index) {
-    const Row = this.props.rowComponent;
-    return (
-      <Row {...datum} rowIndex={index} key={index}/>
-    );
-  },
-  _renderRows: function _renderRows() {
-    const rows = [];
-    const firstRow = 0;
-    for (let rowIndex = firstRow; rowIndex < this.props.data.length; rowIndex++) {
-      rows.push(this._renderRow(this.props.data[rowIndex], rowIndex));
-    }
-    return rows;
+  _renderChunks: function _renderChunks() {
+    const {rowComponent, pageLength} = this.props;
+    return this.state.chunks.map((data, index) => {
+      return (
+        <Chunk data={data} key={index} rowComponent={rowComponent} topIndex={index * pageLength} />
+      );
+    });
   },
   render: function render() {
     const {headerElement, footerElement, data, loadingMessage, noValuesMessage, colCount} = this.props;
     return (
       <table ref='table' onScroll={this.handleScroll}>
        { headerElement }
-       <tbody ref='body'>
        {(() => {
          if (this.state.initialLoading) {
-           return (<tr ref='loading-row' className='centered-row'><td colSpan={colCount}>{loadingMessage}</td></tr>);
+           return (<tbody><tr ref='loading-row' className='centered-row'><td colSpan={colCount}>{loadingMessage}</td></tr></tbody>);
          } else if (data.length === 0 && noValuesMessage) {
-           return (<tr ref='no-value-row' className='centered-row'><td colSpan={colCount}>{noValuesMessage}</td></tr>);
+           return (<tbody><tr ref='no-value-row' className='centered-row'><td colSpan={colCount}>{noValuesMessage}</td></tr></tbody>);
          }
-         return this._renderRows();
+         return this._renderChunks();
        }
        )()}
-       </tbody>
        { footerElement }
       </table>
     );
