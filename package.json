@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "babel-runtime": "^5.8.25",
-    "jquery": "^2.1.4"
+    "jquery": "^2.1.4",
+    "react-addons-pure-render-mixin": "^0.14.0"
   }
 }

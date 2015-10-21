@@ -4,7 +4,7 @@ const {PropTypes} = React;
 
 const $ = require('jquery');
 
-const PRELOAD_PAGES = 2;
+const PRELOAD_PAGES = 5;
 const MAX_PAGES = 1 + 2 * PRELOAD_PAGES;
 
 const InfiniteTable = React.createClass({
@@ -80,16 +80,19 @@ const InfiniteTable = React.createClass({
     const scrollBottom = scrollTop + table.height();
     const rows = table.find('tbody tr');
     const visibleChunks = [];
-    const lastChunk = this.state.bottomChunk - this.state.topChunk;
-    for (let chunkIndex = 0; chunkIndex <= lastChunk; chunkIndex++) {
-      const firstRow = rows.eq(chunkIndex * this.props.pageLength + (this.state.topChunk > 0 ? 1 : 0));
+    // const lastChunk = this.state.bottomChunk - this.state.topChunk;
+    for (let chunkIndex = 0; chunkIndex <= this.state.bottomChunk; chunkIndex++) {
+      if (chunkIndex * this.props.pageLength >= this.props.data.length) {
+        continue;
+      }
+      const firstRow = rows.eq(chunkIndex * this.props.pageLength);
       const chunkTop = firstRow.offset().top - tableTop;
       const topOfChunkVisible = chunkTop >= scrollTop && chunkTop <= scrollBottom;
       const topOfChunkOffBottom = chunkTop > scrollBottom;
       if (topOfChunkVisible) {
         if (chunkIndex === 0) {
           visibleChunks.push(chunkIndex);
-        } else if (chunkIndex === lastChunk) {
+        } else if (chunkIndex === this.state.bottomChunk) {
           visibleChunks.push(chunkIndex - 1);
           visibleChunks.push(chunkIndex);
         } else {
@@ -103,9 +106,9 @@ const InfiniteTable = React.createClass({
       }
     }
     if (visibleChunks.length === 0) {
-      visibleChunks.push(lastChunk);
+      visibleChunks.push(this.state.bottomChunk);
     }
-    return visibleChunks.map(chunkIndex => chunkIndex + this.state.topChunk);
+    return visibleChunks;
   },
   _handleChunkUpdate: function _handleChunkUpdate(prevState, nextState) {
     const prevTopChunk = prevState.topChunk;
@@ -114,9 +117,9 @@ const InfiniteTable = React.createClass({
     for (let chunkIndex = prevTopChunk; chunkIndex < topChunk; chunkIndex++) {
       newHeight += this._calculateChunkHeight(chunkIndex);
     }
-    this.setState({
-      hiddenTop: newHeight,
-    });
+    // this.setState({
+    //   hiddenTop: newHeight,
+    // });
   },
   handleScroll: function handleScroll() {
     const {pageLength, loadData} = this.props;
@@ -125,7 +128,8 @@ const InfiniteTable = React.createClass({
     // How to handle telling when there's no more to scroll?
     const newTopChunk = Math.max(visibleChunks[0] - PRELOAD_PAGES, 0);
     const newBottomChunk = Math.max(visibleChunks[0] + PRELOAD_PAGES, MAX_PAGES);
-    const scrolledDown = visibleChunks[visibleChunks.length - 1] >= bottomChunk;
+    const triggeringChunk = bottomChunk - Math.floor(PRELOAD_PAGES / 2);
+    const scrolledDown = visibleChunks[visibleChunks.length - 1] >= triggeringChunk;
     const scrolledUp = topChunk > 0 && visibleChunks[0] <= topChunk;
     if (scrolledDown || scrolledUp) {
       loadData(newTopChunk * pageLength, (newBottomChunk + 1) * pageLength);
@@ -145,14 +149,7 @@ const InfiniteTable = React.createClass({
   _renderRows: function _renderRows() {
     const rows = [];
     const firstRow = 0;
-    const lastRow = MAX_PAGES * this.props.pageLength;
-    const {hiddenTop} = this.state;
-    if (hiddenTop > 0) {
-      rows.push(
-        <tr key='hiddenTop' style={{height: hiddenTop + 'px'}} />
-      );
-    }
-    for (let rowIndex = firstRow; rowIndex < lastRow && rowIndex < this.props.data.length; rowIndex++) {
+    for (let rowIndex = firstRow; rowIndex < this.props.data.length; rowIndex++) {
       rows.push(this._renderRow(this.props.data[rowIndex], rowIndex));
     }
     return rows;
