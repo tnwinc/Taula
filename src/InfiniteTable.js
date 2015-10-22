@@ -61,9 +61,9 @@ const InfiniteTable = React.createClass({
   getInitialLength: function getInitialLength() {
     return this.props.pageLength * MAX_PAGES;
   },
-  resetData: function resetData() {
+  resetData: function resetData(callback) {
     domFromReact(this.refs.table).scrollTop(0);
-    this.setState(this.getInitialState());
+    this.setState(this.getInitialState(), callback);
   },
   _updateChunkedData: function _updateChunkedData(data) {
     const chunks = this.state.chunks;
