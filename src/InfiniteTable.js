@@ -10,6 +10,7 @@ const MAX_PAGES = 1 + 2 * PRELOAD_PAGES;
 const Chunk = require('./Chunk');
 const update = require('react-addons-update');
 const debounce = require('lodash.debounce');
+const {domFromReact} = require('./Utils');
 
 const InfiniteTable = React.createClass({
   displayName: 'InfiniteTable',
@@ -50,14 +51,18 @@ const InfiniteTable = React.createClass({
     this.debouncedLoadData = debounce(this.props.loadData, 200);
   },
   componentDidMount: function componentDidMount() {
-    this.props.loadData(0, this.props.pageLength * MAX_PAGES);
+    this.props.loadData(0, this.getInitialLength());
   },
   componentWillUpdate: function componentWillUpdate(nextProps) {
     if (nextProps.data !== this.props.data) {
       this._updateChunkedData(nextProps.data);
     }
   },
+  getInitialLength: function getInitialLength() {
+    return this.props.pageLength * MAX_PAGES;
+  },
   resetData: function resetData() {
+    domFromReact(this.refs.table).scrollTop(0);
     this.setState(this.getInitialState());
   },
   _updateChunkedData: function _updateChunkedData(data) {
