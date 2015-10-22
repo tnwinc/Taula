@@ -26,9 +26,9 @@ const InfiniteTable = React.createClass({
       rowClass: PropTypes.string,
       colSpanOverride: PropTypes.number,
     })).isRequired,
-    // loading: PropTypes.bool,
     loadingMessage: PropTypes.node,
-    noValuesMessage: PropTypes.node,
+    loading: PropTypes.bool,
+    noItemsText: PropTypes.string,
     bulkLoad: PropTypes.bool,
     loadData: PropTypes.func,
   },
@@ -43,7 +43,6 @@ const InfiniteTable = React.createClass({
       bottomChunk: MAX_PAGES - 1,
       hiddenTop: 0,
       hiddenBottom: 0,
-      initialLoading: true,
       chunks: [],
     };
   },
@@ -56,9 +55,6 @@ const InfiniteTable = React.createClass({
   componentWillUpdate: function componentWillUpdate(nextProps) {
     if (nextProps.data !== this.props.data) {
       this._updateChunkedData(nextProps.data);
-      this.setState({
-        initialLoading: false,
-      });
     }
   },
   resetData: function resetData() {
@@ -121,29 +117,30 @@ const InfiniteTable = React.createClass({
     }
   },
   _renderChunks: function _renderChunks() {
-    const {rowComponent, pageLength} = this.props;
+    const {rowComponent, pageLength, columns} = this.props;
     const {topChunk, bottomChunk} = this.state;
     return this.state.chunks.map((data, index) => {
       const chunkIsVisible = (index >= topChunk && index <= bottomChunk);
       return (
-        <Chunk index={index} visible={chunkIsVisible} ref={index} data={data} key={index} rowComponent={rowComponent} topIndex={index * pageLength} />
+        <Chunk index={index} visible={chunkIsVisible} ref={index} data={data} key={index} columns={columns} rowComponent={rowComponent} topIndex={index * pageLength} />
       );
     });
   },
   render: function render() {
-    const {headerElement, footerElement, data, loadingMessage, noValuesMessage, colCount} = this.props;
+    const {headerElement, footerElement, data, loadingMessage, noItemsText, colCount} = this.props;
     return (
-      <table ref='table' onScroll={this.handleScroll}>
+      <table className='react-table' ref='table' onScroll={this.handleScroll}>
        { headerElement }
        {(() => {
-         if (this.state.initialLoading) {
-           return (<tbody><tr ref='loading-row' className='centered-row'><td colSpan={colCount}>{loadingMessage}</td></tr></tbody>);
-         } else if (data.length === 0 && noValuesMessage) {
-           return (<tbody><tr ref='no-value-row' className='centered-row'><td colSpan={colCount}>{noValuesMessage}</td></tr></tbody>);
+         if (!this.props.loading && data.length === 0 && noItemsText) {
+           return (<tbody><tr ref='no-value-row' className='centered-row'><td colSpan={colCount}>{noItemsText}</td></tr></tbody>);
          }
          return this._renderChunks();
        }
        )()}
+       {
+         this.props.loading ? <tbody><tr className='centered-row'><td colSpan={colCount}>{loadingMessage}</td></tr></tbody> : undefined
+       }
        { footerElement }
       </table>
     );
