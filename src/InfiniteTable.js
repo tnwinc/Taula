@@ -82,25 +82,17 @@ const InfiniteTable = React.createClass({
       chunks: updatedChunks,
     });
   },
-  _calculateChunkHeight: function _calculateChunkHeight(index) {
-    const rows = $(this.refs.body).find('tr');
-    // offset for hidden trs?
-    const firstRow = index * this.props.pageLength;
-    const lastRow = (index + 1) * this.props.pageLength;
-    let sum = 0;
-    for (let rowIndex = firstRow; rowIndex < lastRow; rowIndex++) {
-      sum += rows.eq(rowIndex).height();
-    }
-    return sum;
-  },
   _findVisibleChunks: function findVisibleChunks() {
     const table = $(this.refs.table);
     const visibleChunks = [];
-    for (let chunkIndex = 0; chunkIndex <= this.state.bottomChunk; chunkIndex++) {
-      const chunk = this.refs[chunkIndex.toString()];
-      if (chunk && chunk.isVisibleIn(table)) {
+    let chunkIndex = 0;
+    let chunk = this.refs['0'];
+    while (chunk) {
+      if (chunk.isVisibleIn(table)) {
         visibleChunks.push(chunkIndex);
       }
+      chunkIndex++;
+      chunk = this.refs[chunkIndex.toString()];
     }
     return visibleChunks;
   },
