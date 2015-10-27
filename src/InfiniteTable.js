@@ -41,13 +41,16 @@ const InfiniteTable = React.createClass({
     return {
       topChunk: 0,
       bottomChunk: MAX_CHUNKS - 1,
-      hiddenTop: 0,
-      hiddenBottom: 0,
       chunks: [],
+      noMoreToLoad: false,
     };
   },
   componentWillMount: function componentWillMount() {
-    this.debouncedLoadData = debounce(this.props.loadData, 200);
+    this.debouncedLoadData = debounce((bottomIndex)=> {
+      if (!this.state.noMoreToLoad) {
+        this.props.loadData(bottomIndex);
+      }
+    }, 200);
   },
   componentDidMount: function componentDidMount() {
     this.props.loadData(this.getInitialLength());
@@ -69,16 +72,20 @@ const InfiniteTable = React.createClass({
     const {pageLength} = this.props;
     const dataChunkCount = Math.ceil(data.length / pageLength);
     const newChunks = [];
+    let foundAShortChunk = false;
     for (let chunkIndex = chunks.length; chunkIndex < dataChunkCount; chunkIndex++) {
       const topIndex = chunkIndex * pageLength;
       const bottomIndex = (chunkIndex + 1) * pageLength;
-      newChunks.push(data.slice(topIndex, bottomIndex));
+      const slice = data.slice(topIndex, bottomIndex);
+      foundAShortChunk = slice.length < pageLength;
+      newChunks.push(slice);
     }
     const updatedChunks = update(chunks, {
       $push: newChunks,
     });
     this.setState({
       chunks: updatedChunks,
+      noMoreToLoad: foundAShortChunk,
     });
   },
   _findVisibleChunks: function _findVisibleChunks() {
