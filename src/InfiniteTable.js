@@ -18,7 +18,6 @@ const InfiniteTable = React.createClass({
     pageLength: PropTypes.number.isRequired,
     rowComponent: PropTypes.func,
     headerElement: PropTypes.node,
-    footerElement: PropTypes.node,
     columns: PropTypes.arrayOf(PropTypes.object),
     colCount: PropTypes.number.isRequired,
     data: PropTypes.arrayOf(PropTypes.shape({
@@ -131,7 +130,7 @@ const InfiniteTable = React.createClass({
     });
   },
   render: function render() {
-    const {headerElement, footerElement, data, loadingMessage, noItemsText, colCount} = this.props;
+    const {headerElement, data, loadingMessage, noItemsText, colCount} = this.props;
     return (
       <table className='react-table' ref='table' onScroll={this.handleScroll}>
        { headerElement }
@@ -145,7 +144,6 @@ const InfiniteTable = React.createClass({
        {
          this.props.loading ? <tbody><tr className='centered-row'><td colSpan={colCount}>{loadingMessage}</td></tr></tbody> : undefined
        }
-       { footerElement }
       </table>
     );
   },
