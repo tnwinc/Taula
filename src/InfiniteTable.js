@@ -4,8 +4,8 @@ const {PropTypes} = React;
 
 const $ = require('jquery');
 
-const PRELOAD_PAGES = 3;
-const MAX_PAGES = 1 + 2 * PRELOAD_PAGES;
+const PRELOAD_CHUNKS = 3;
+const MAX_CHUNKS = 1 + 2 * PRELOAD_CHUNKS;
 
 const Chunk = require('./Chunk');
 const update = require('react-addons-update');
@@ -41,7 +41,7 @@ const InfiniteTable = React.createClass({
   getInitialState: function getInitialState() {
     return {
       topChunk: 0,
-      bottomChunk: MAX_PAGES - 1,
+      bottomChunk: MAX_CHUNKS - 1,
       hiddenTop: 0,
       hiddenBottom: 0,
       chunks: [],
@@ -51,7 +51,7 @@ const InfiniteTable = React.createClass({
     this.debouncedLoadData = debounce(this.props.loadData, 200);
   },
   componentDidMount: function componentDidMount() {
-    this.props.loadData(0, this.getInitialLength());
+    this.props.loadData(this.getInitialLength());
   },
   componentWillUpdate: function componentWillUpdate(nextProps) {
     if (nextProps.data !== this.props.data) {
@@ -59,7 +59,7 @@ const InfiniteTable = React.createClass({
     }
   },
   getInitialLength: function getInitialLength() {
-    return this.props.pageLength * MAX_PAGES;
+    return this.props.pageLength * MAX_CHUNKS;
   },
   resetData: function resetData(callback) {
     domFromReact(this.refs.table).scrollTop(0);
@@ -82,14 +82,19 @@ const InfiniteTable = React.createClass({
       chunks: updatedChunks,
     });
   },
-  _findVisibleChunks: function findVisibleChunks() {
+  _findVisibleChunks: function _findVisibleChunks() {
     const table = $(this.refs.table);
     const visibleChunks = [];
     let chunkIndex = 0;
     let chunk = this.refs['0'];
+    let foundVisibleChunk = false;
     while (chunk) {
       if (chunk.isVisibleIn(table)) {
+        foundVisibleChunk = true;
         visibleChunks.push(chunkIndex);
+      } else if (foundVisibleChunk) {
+        // in this case, we know that there's no more visible chunks
+        break;
       }
       chunkIndex++;
       chunk = this.refs[chunkIndex.toString()];
@@ -100,13 +105,15 @@ const InfiniteTable = React.createClass({
     const {pageLength} = this.props;
     const {topChunk, bottomChunk} = this.state;
     const visibleChunks = this._findVisibleChunks();
-    const newTopChunk = Math.max(visibleChunks[0] - PRELOAD_PAGES, 0);
-    const newBottomChunk = Math.max(visibleChunks[0] + PRELOAD_PAGES, MAX_PAGES);
-    const triggeringChunk = bottomChunk - Math.floor(PRELOAD_PAGES / 2);
+    const newTopChunk = Math.max(visibleChunks[0] - PRELOAD_CHUNKS, 0);
+    const newBottomChunk = Math.max(visibleChunks[0] + PRELOAD_CHUNKS, MAX_CHUNKS);
+    const triggerCount = Math.floor(PRELOAD_CHUNKS / 2);
+    const triggeringChunk = bottomChunk - triggerCount;
+    const triggeringChunkTop = topChunk + triggerCount;
     const scrolledDown = visibleChunks[visibleChunks.length - 1] >= triggeringChunk;
-    const scrolledUp = topChunk > 0 && visibleChunks[0] <= topChunk;
+    const scrolledUp = topChunk > 0 && visibleChunks[0] <= triggeringChunkTop;
     if (scrolledDown || scrolledUp) {
-      this.debouncedLoadData(newTopChunk * pageLength, (newBottomChunk + 1) * pageLength);
+      this.debouncedLoadData((newBottomChunk + 1) * pageLength);
       this.setState({
         topChunk: newTopChunk,
         bottomChunk: newBottomChunk,
