@@ -47,8 +47,10 @@ const Chunk = React.createClass({
   },
 
   isVisibleIn: function isVisibleIn(parent) {
-    const parentTop = parent.offset().top;
+    const parentOffset = parent.offset();
     const parentHeight = parent.height();
+    // window doesn't have an offset, so if it's our parent, use its scrollTop
+    const parentTop = parentOffset ? parentOffset.top : parent.scrollTop();
     const myTop = this.body.offset().top - parentTop;
     const myBottom = myTop + this.getHeight();
     if (myTop >= 0 && myTop <= parentHeight) {

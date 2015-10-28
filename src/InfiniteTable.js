@@ -12,6 +12,7 @@ const Chunk = require('./Chunk');
 const update = require('react-addons-update');
 const debounce = require('lodash.debounce');
 const {domFromReact} = require('./Utils');
+const scrollparent = require('scrollparent');
 
 const InfiniteTable = React.createClass({
   displayName: 'InfiniteTable',
@@ -57,7 +58,10 @@ const InfiniteTable = React.createClass({
     }, 200);
   },
 
+
   componentDidMount: function componentDidMount() {
+    this.scrollParent = $(scrollparent(this.refs.table));
+    this.scrollParent.on('scroll', this.handleScroll);
     this.props.loadData(this.getInitialLength());
   },
 
@@ -65,6 +69,10 @@ const InfiniteTable = React.createClass({
     if (nextProps.data !== this.props.data) {
       this._updateChunkedData(nextProps.data);
     }
+  },
+
+  componentWillUnmount: function componentWillUnmount() {
+    this.scrollParent.off('scroll', this.handleScroll);
   },
 
   getInitialLength: function getInitialLength() {
@@ -99,13 +107,13 @@ const InfiniteTable = React.createClass({
   },
 
   _findVisibleChunks: function _findVisibleChunks() {
-    const table = $(this.refs.table);
+    const parent = $(scrollparent(this.refs.table));
     const visibleChunks = [];
     let chunkIndex = 0;
     let chunk = this.refs['0'];
     let foundVisibleChunk = false;
     while (chunk) {
-      if (chunk.isVisibleIn(table)) {
+      if (chunk.isVisibleIn(parent)) {
         foundVisibleChunk = true;
         visibleChunks.push(chunkIndex);
       } else if (foundVisibleChunk) {
