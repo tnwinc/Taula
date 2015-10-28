@@ -15,6 +15,7 @@ const {domFromReact} = require('./Utils');
 
 const InfiniteTable = React.createClass({
   displayName: 'InfiniteTable',
+
   propTypes: {
     customRowComponent: PropTypes.func,
     headerElement: PropTypes.node,
@@ -32,11 +33,13 @@ const InfiniteTable = React.createClass({
     chunkSize: PropTypes.number.isRequired,
     loadData: PropTypes.func,
   },
+
   getDefaultProps: function getDefaultProps() {
     return {
       customRowComponent: require('./DefaultRow.js'),
     };
   },
+
   getInitialState: function getInitialState() {
     return {
       topChunk: 0,
@@ -45,6 +48,7 @@ const InfiniteTable = React.createClass({
       noMoreToLoad: false,
     };
   },
+
   componentWillMount: function componentWillMount() {
     this.debouncedLoadData = debounce((bottomIndex)=> {
       if (!this.state.noMoreToLoad) {
@@ -52,21 +56,26 @@ const InfiniteTable = React.createClass({
       }
     }, 200);
   },
+
   componentDidMount: function componentDidMount() {
     this.props.loadData(this.getInitialLength());
   },
+
   componentWillUpdate: function componentWillUpdate(nextProps) {
     if (nextProps.data !== this.props.data) {
       this._updateChunkedData(nextProps.data);
     }
   },
+
   getInitialLength: function getInitialLength() {
     return this.props.chunkSize * MIN_CHUNKS;
   },
+
   resetData: function resetData(callback) {
     domFromReact(this.refs.table).scrollTop(0);
     this.setState(this.getInitialState(), callback);
   },
+
   _updateChunkedData: function _updateChunkedData(data) {
     const chunks = this.state.chunks;
     const {chunkSize} = this.props;
@@ -88,6 +97,7 @@ const InfiniteTable = React.createClass({
       noMoreToLoad: foundAShortChunk,
     });
   },
+
   _findVisibleChunks: function _findVisibleChunks() {
     const table = $(this.refs.table);
     const visibleChunks = [];
@@ -107,6 +117,7 @@ const InfiniteTable = React.createClass({
     }
     return visibleChunks;
   },
+
   handleScroll: function handleScroll() {
     const {chunkSize} = this.props;
     const {topChunk, bottomChunk} = this.state;
@@ -125,6 +136,7 @@ const InfiniteTable = React.createClass({
       });
     }
   },
+
   _renderChunks: function _renderChunks() {
     const {customRowComponent, columnMetadata} = this.props;
     const {topChunk, bottomChunk} = this.state;
@@ -135,6 +147,7 @@ const InfiniteTable = React.createClass({
       );
     });
   },
+
   render: function render() {
     const {headerElement, data, loading, loadingMessage, noDataMessage, columnCount} = this.props;
     return (

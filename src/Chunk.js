@@ -5,6 +5,7 @@ const {domFromReact} = require('./Utils');
 
 const Chunk = React.createClass({
   displayName: 'Chunk',
+
   propTypes: {
     data: PropTypes.arrayOf(PropTypes.shape({
       rowData: PropTypes.arrayOf(PropTypes.node),
@@ -82,6 +83,7 @@ const Chunk = React.createClass({
       />
     );
   },
+
   render: function render() {
     if (this.props.visible) {
       return (
