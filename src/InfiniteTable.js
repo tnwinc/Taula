@@ -15,26 +15,25 @@ const {domFromReact} = require('./Utils');
 const InfiniteTable = React.createClass({
   displayName: 'InfiniteTable',
   propTypes: {
-    pageLength: PropTypes.number.isRequired,
-    rowComponent: PropTypes.func,
+    customRowComponent: PropTypes.func,
     headerElement: PropTypes.node,
-    columns: PropTypes.arrayOf(PropTypes.object),
-    colCount: PropTypes.number.isRequired,
+    columnMetadata: PropTypes.arrayOf(PropTypes.object),
+    columnCount: PropTypes.number.isRequired,
     data: PropTypes.arrayOf(PropTypes.shape({
       rowData: PropTypes.arrayOf(PropTypes.node),
       item: PropTypes.object,
       rowClass: PropTypes.string,
       colSpanOverride: PropTypes.number,
     })).isRequired,
-    loadingMessage: PropTypes.node,
     loading: PropTypes.bool,
-    noItemsText: PropTypes.string,
-    bulkLoad: PropTypes.bool,
+    loadingMessage: PropTypes.node,
+    noDataMessage: PropTypes.string,
+    chunkSize: PropTypes.number.isRequired,
     loadData: PropTypes.func,
   },
   getDefaultProps: function getDefaultProps() {
     return {
-      rowComponent: require('./DefaultRow.js'),
+      customRowComponent: require('./DefaultRow.js'),
     };
   },
   getInitialState: function getInitialState() {
@@ -61,7 +60,7 @@ const InfiniteTable = React.createClass({
     }
   },
   getInitialLength: function getInitialLength() {
-    return this.props.pageLength * MAX_CHUNKS;
+    return this.props.chunkSize * MAX_CHUNKS;
   },
   resetData: function resetData(callback) {
     domFromReact(this.refs.table).scrollTop(0);
@@ -69,15 +68,15 @@ const InfiniteTable = React.createClass({
   },
   _updateChunkedData: function _updateChunkedData(data) {
     const chunks = this.state.chunks;
-    const {pageLength} = this.props;
-    const dataChunkCount = Math.ceil(data.length / pageLength);
+    const {chunkSize} = this.props;
+    const dataChunkCount = Math.ceil(data.length / chunkSize);
     const newChunks = [];
     let foundAShortChunk = false;
     for (let chunkIndex = chunks.length; chunkIndex < dataChunkCount; chunkIndex++) {
-      const topIndex = chunkIndex * pageLength;
-      const bottomIndex = (chunkIndex + 1) * pageLength;
+      const topIndex = chunkIndex * chunkSize;
+      const bottomIndex = (chunkIndex + 1) * chunkSize;
       const slice = data.slice(topIndex, bottomIndex);
-      foundAShortChunk = slice.length < pageLength;
+      foundAShortChunk = slice.length < chunkSize;
       newChunks.push(slice);
     }
     const updatedChunks = update(chunks, {
@@ -108,7 +107,7 @@ const InfiniteTable = React.createClass({
     return visibleChunks;
   },
   handleScroll: function handleScroll() {
-    const {pageLength} = this.props;
+    const {chunkSize} = this.props;
     const {topChunk, bottomChunk} = this.state;
     const visibleChunks = this._findVisibleChunks();
     const newTopChunk = Math.max(visibleChunks[0] - PRELOAD_CHUNKS, 0);
@@ -119,7 +118,7 @@ const InfiniteTable = React.createClass({
     const scrolledDown = visibleChunks[visibleChunks.length - 1] >= triggeringChunk;
     const scrolledUp = topChunk > 0 && visibleChunks[0] <= triggeringChunkTop;
     if (scrolledDown || scrolledUp) {
-      this.debouncedLoadData((newBottomChunk + 1) * pageLength);
+      this.debouncedLoadData((newBottomChunk + 1) * chunkSize);
       this.setState({
         topChunk: newTopChunk,
         bottomChunk: newBottomChunk,
@@ -127,29 +126,29 @@ const InfiniteTable = React.createClass({
     }
   },
   _renderChunks: function _renderChunks() {
-    const {rowComponent, pageLength, columns} = this.props;
+    const {customRowComponent, columnMetadata} = this.props;
     const {topChunk, bottomChunk} = this.state;
-    return this.state.chunks.map((data, index) => {
-      const chunkIsVisible = (index >= topChunk && index <= bottomChunk);
+    return this.state.chunks.map((data, chunkIndex) => {
+      const chunkIsVisible = (chunkIndex >= topChunk && chunkIndex <= bottomChunk);
       return (
-        <Chunk index={index} visible={chunkIsVisible} ref={index} data={data} key={index} columns={columns} rowComponent={rowComponent} topIndex={index * pageLength} />
+        <Chunk visible={chunkIsVisible} ref={chunkIndex} data={data} key={chunkIndex} columnMetadata={columnMetadata} rowComponent={customRowComponent} />
       );
     });
   },
   render: function render() {
-    const {headerElement, data, loadingMessage, noItemsText, colCount} = this.props;
+    const {headerElement, data, loadingMessage, noDataMessage, columnCount} = this.props;
     return (
       <table className='react-table' ref='table' onScroll={this.handleScroll}>
        { headerElement }
        {(() => {
-         if (!this.props.loading && data.length === 0 && noItemsText) {
-           return (<tbody><tr ref='no-value-row' className='centered-row'><td colSpan={colCount}>{noItemsText}</td></tr></tbody>);
+         if (!this.props.loading && data.length === 0 && noDataMessage) {
+           return (<tbody><tr ref='no-value-row' className='centered-row'><td colSpan={columnCount}>{noDataMessage}</td></tr></tbody>);
          }
          return this._renderChunks();
        }
        )()}
        {
-         this.props.loading ? <tbody><tr className='centered-row'><td colSpan={colCount}>{loadingMessage}</td></tr></tbody> : undefined
+         this.props.loading ? <tbody><tr className='centered-row'><td colSpan={columnCount}>{loadingMessage}</td></tr></tbody> : undefined
        }
       </table>
     );

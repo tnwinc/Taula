@@ -13,11 +13,9 @@ const Chunk = React.createClass({
       colSpanOverride: PropTypes.number,
       otherProps: PropTypes.object,
     })).isRequired,
-    topIndex: PropTypes.number.isRequired,
     rowComponent: PropTypes.func.isRequired,
     visible: PropTypes.bool.isRequired,
-    index: PropTypes.number,
-    columns: PropTypes.arrayOf(PropTypes.object),
+    columnMetadata: PropTypes.arrayOf(PropTypes.object),
   },
   mixins: [PureRenderMixin],
 
@@ -51,7 +49,7 @@ const Chunk = React.createClass({
     const parentTop = parent.offset().top;
     const parentHeight = parent.height();
     const myTop = this.body.offset().top - parentTop;
-    const myBottom = myTop + (this.props.visible ? this.getHeight() : this.state.height);
+    const myBottom = myTop + this.getHeight();
     if (myTop >= 0 && myTop <= parentHeight) {
       return true;
     } else if (myBottom >= 0 && myBottom <= parentHeight) {
@@ -67,11 +65,21 @@ const Chunk = React.createClass({
   },
 
   _renderRow: function _renderRow(datum, index) {
-    const {rowComponent, columns} = this.props;
+    const {rowComponent, columnMetadata} = this.props;
     const Row = rowComponent;
     const {rowData, item, rowClass, colSpanOverride, otherProps} = datum;
     return (
-      <Row columns={columns} rowData={rowData} item={item} rowClass={rowClass} colSpanOverride={colSpanOverride} rowIndex={index} otherProps={otherProps} key={index} ref={index}/>
+      <Row
+        ref={index}
+        key={index}
+        columnMetadata={columnMetadata}
+        rowData={rowData}
+        item={item}
+        rowClass={rowClass}
+        colSpanOverride={colSpanOverride}
+        rowIndex={index}
+        otherProps={otherProps}
+      />
     );
   },
   render: function render() {
