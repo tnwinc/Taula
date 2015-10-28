@@ -5,7 +5,8 @@ const {PropTypes} = React;
 const $ = require('jquery');
 
 const PRELOAD_CHUNKS = 3;
-const MAX_CHUNKS = 1 + 2 * PRELOAD_CHUNKS;
+const MIN_CHUNKS = 1 + 2 * PRELOAD_CHUNKS;
+const TRIGGER_COUNT = Math.floor(PRELOAD_CHUNKS / 2);
 
 const Chunk = require('./Chunk');
 const update = require('react-addons-update');
@@ -39,7 +40,7 @@ const InfiniteTable = React.createClass({
   getInitialState: function getInitialState() {
     return {
       topChunk: 0,
-      bottomChunk: MAX_CHUNKS - 1,
+      bottomChunk: MIN_CHUNKS - 1,
       chunks: [],
       noMoreToLoad: false,
     };
@@ -60,7 +61,7 @@ const InfiniteTable = React.createClass({
     }
   },
   getInitialLength: function getInitialLength() {
-    return this.props.chunkSize * MAX_CHUNKS;
+    return this.props.chunkSize * MIN_CHUNKS;
   },
   resetData: function resetData(callback) {
     domFromReact(this.refs.table).scrollTop(0);
@@ -111,11 +112,10 @@ const InfiniteTable = React.createClass({
     const {topChunk, bottomChunk} = this.state;
     const visibleChunks = this._findVisibleChunks();
     const newTopChunk = Math.max(visibleChunks[0] - PRELOAD_CHUNKS, 0);
-    const newBottomChunk = Math.max(visibleChunks[0] + PRELOAD_CHUNKS, MAX_CHUNKS);
-    const triggerCount = Math.floor(PRELOAD_CHUNKS / 2);
-    const triggeringChunk = bottomChunk - triggerCount;
-    const triggeringChunkTop = topChunk + triggerCount;
-    const scrolledDown = visibleChunks[visibleChunks.length - 1] >= triggeringChunk;
+    const newBottomChunk = Math.max(visibleChunks[0] + PRELOAD_CHUNKS, MIN_CHUNKS);
+    const triggeringChunkTop = topChunk + TRIGGER_COUNT;
+    const triggeringChunkBottom = bottomChunk - TRIGGER_COUNT;
+    const scrolledDown = visibleChunks[visibleChunks.length - 1] >= triggeringChunkBottom;
     const scrolledUp = topChunk > 0 && visibleChunks[0] <= triggeringChunkTop;
     if (scrolledDown || scrolledUp) {
       this.debouncedLoadData((newBottomChunk + 1) * chunkSize);
@@ -136,19 +136,19 @@ const InfiniteTable = React.createClass({
     });
   },
   render: function render() {
-    const {headerElement, data, loadingMessage, noDataMessage, columnCount} = this.props;
+    const {headerElement, data, loading, loadingMessage, noDataMessage, columnCount} = this.props;
     return (
       <table className='react-table' ref='table' onScroll={this.handleScroll}>
        { headerElement }
        {(() => {
-         if (!this.props.loading && data.length === 0 && noDataMessage) {
+         if (!loading && data.length === 0 && noDataMessage) {
            return (<tbody><tr ref='no-value-row' className='centered-row'><td colSpan={columnCount}>{noDataMessage}</td></tr></tbody>);
          }
          return this._renderChunks();
        }
        )()}
        {
-         this.props.loading ? <tbody><tr className='centered-row'><td colSpan={columnCount}>{loadingMessage}</td></tr></tbody> : undefined
+         loading ? <tbody><tr className='centered-row'><td colSpan={columnCount}>{loadingMessage}</td></tr></tbody> : undefined
        }
       </table>
     );
