@@ -6,7 +6,8 @@
   "scripts": {
     "test": "karma start karma.conf.js --single-run --browsers Firefox",
     "lint": "./node_modules/.bin/eslint -c ./.eslintrc.json src/**/*.js ; exit 0",
-    "build": "webpack -p"
+    "build": "webpack -p",
+    "watch": "karma start"
   },
   "author": "Will Stamper",
   "license": "ISC",
