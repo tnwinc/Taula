@@ -2,6 +2,7 @@ React = require 'react'
 {createRenderer, isElementOfType, renderIntoDocument} = require 'react-addons-test-utils'
 Chunk  = require '../src/Chunk.js'
 DefaultRow  = require '../src/DefaultRow.js'
+{domFromReact, setupForTest, renderFromReactClass} = require('../src/Utils')
 
 {Children} = React
 
@@ -17,11 +18,12 @@ describe 'chunk of table rows', ->
   beforeEach ->
     @rows = []
     @rows.push getRow(index) for index in [1..10]
+    setupForTest()
 
   describe 'when it renders', ->
     describe 'when chunk is not visible', ->
       beforeEach ->
-        @row = renderIntoDocument(React.createElement Chunk,
+        {@component, @element, @$domNode} = renderFromReactClass(Chunk,
           data:[
             rowData: @rows
             rowClass: 'row-class'
@@ -29,10 +31,12 @@ describe 'chunk of table rows', ->
           ],
           rowComponent: DefaultRow
           visible: false
-        ) 
+        ,
+        'table'
+        )
 
       it 'should render a tbody', ->
-        expect(@row.type).to.equal 'tbody'
+        expect(@$domNode.is('tbody')).to.be.true
       it 'should have a single child with the correct height', ->
 
     describe 'when chunk is visible', ->
@@ -48,8 +52,7 @@ describe 'chunk of table rows', ->
         ) 
         @row = shallowRenderer.getRenderOutput()
 
-      it 'should render a tbody', ->
+      it 'should render a visible chunk tbody', ->
         expect(@row.type).to.equal 'tbody'
       it 'should have default row as its first child', ->
         expect(isElementOfType(Children.toArray(@row.props.children)[0], DefaultRow)).to.be.true
-

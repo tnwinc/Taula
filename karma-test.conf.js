@@ -35,13 +35,13 @@ module.exports = function(config) {
     webpack: {
       resolve: webpackConfig.resolve,
       module: {
-        preLoaders: webpackConfig.module.preLoaders.concat([
+        preLoaders:[
           {
             test: /\.js$/,
             exclude: /(dist|node_modules|bower_components)/,
             loader: 'isparta'
           }
-        ]),
+        ],
         loaders: webpackConfig.module.loaders
       }
     },

@@ -35,7 +35,6 @@ module.exports = function(config) {
     webpack: {
       resolve: webpackConfig.resolve,
       module: {
-        preLoaders: webpackConfig.module.preLoaders,
         loaders: webpackConfig.module.loaders
       }
     },
