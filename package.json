@@ -4,10 +4,10 @@
   "description": "",
   "main": "dist/InfiniteTable.js",
   "scripts": {
-    "test": "karma start karma.conf.js --single-run --browsers Firefox",
+    "test": "./node_modules/.bin/karma start karma-test.conf.js",
     "lint": "./node_modules/.bin/eslint -c ./.eslintrc.json src/**/*.js ; exit 0",
     "build": "webpack -p",
-    "watch": "karma start"
+    "watch": "./node_modules/.bin/karma start karma.conf.js"
   },
   "author": "Will Stamper",
   "license": "ISC",

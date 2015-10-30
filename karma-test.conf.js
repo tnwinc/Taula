@@ -35,7 +35,13 @@ module.exports = function(config) {
     webpack: {
       resolve: webpackConfig.resolve,
       module: {
-        preLoaders: webpackConfig.module.preLoaders,
+        preLoaders: webpackConfig.module.preLoaders.concat([
+          {
+            test: /\.js$/,
+            exclude: /(dist|node_modules|bower_components)/,
+            loader: 'isparta'
+          }
+        ]),
         loaders: webpackConfig.module.loaders
       }
     },
@@ -75,16 +81,16 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    autoWatch: false,
 
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['Firefox'],
 
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: true
   })
 }
