@@ -20,7 +20,37 @@ describe 'chunk of table rows', ->
     @rows.push getRow(index) for index in [1..10]
     setupForTest()
 
-  describe 'when it renders', ->
+  describe 'when it mounts', ->
+    it 'should store a ref to the tbody',->
+  describe 'when the visibility changes', ->
+    describe 'to hidden', ->
+      it 'should store the height', ->
+    describe 'to visible',->
+      it 'should not store the height', ->
+  describe 'when it updates', ->
+    it 'should store a ref to the tbody', ->
+  describe 'getting the height',->
+    describe 'when its visible', ->
+      it 'should get the height from the dom',->
+    describe 'when its hidden', ->
+      it 'should get the height from the state', ->
+  describe 'when checking visibility', ->
+    describe 'when the scroll parent is the window', ->
+      describe 'when the chunk is fully contained',->
+      describe 'when the chunk is partially off the top',->
+      describe 'when the chunk is partially off the bottom',->
+      describe 'when the chunk is off the bottom',->
+      describe 'when the chunk is off the top',->
+      describe 'when the chunk is larger than the parent height and it\'s completely visible', ->
+    describe 'when the scroll parent is not the window',->
+      describe 'when the chunk is fully contained',->
+      describe 'when the chunk is partially off the top',->
+      describe 'when the chunk is partially off the bottom',->
+      describe 'when the chunk is off the bottom',->
+      describe 'when the chunk is off the top',->
+      describe 'when the chunk is larger than the parent height and it\'s completely visible', ->
+        
+  describe 'when it renders',->
     describe 'when chunk is not visible', ->
       beforeEach ->
         {@component, @element, @$domNode} = renderFromReactClass(Chunk,
