@@ -1,10 +1,9 @@
 React = require 'react'
-{Children} = React
-{createRenderer, isElementOfType, renderIntoDocument, scryRenderedComponentsWithType} = require 'react-addons-test-utils'
+{scryRenderedComponentsWithType} = require 'react-addons-test-utils'
 
 Chunk  = require '../src/Chunk.js'
 
-{domFromReact, setupForTest, renderFromReactClass} = require('../src/Utils')
+{setupForTest, renderFromReactClass} = require('../src/Utils')
 
 chai = require 'chai'
 sinon = require 'sinon'
@@ -12,8 +11,6 @@ sinonChai = require 'sinon-chai'
 chai.use sinonChai
 {expect} = chai
 {spy, stub} = sinon
-
-shallowRenderer = createRenderer()
 
 getRowData = (index) ->
   return ["column#{index}1", "column2#{index}", "column3#{index}"]
