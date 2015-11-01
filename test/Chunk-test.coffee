@@ -1,9 +1,8 @@
 React = require 'react'
 {Children} = React
-{createRenderer, isElementOfType, renderIntoDocument} = require 'react-addons-test-utils'
+{createRenderer, isElementOfType, renderIntoDocument, scryRenderedComponentsWithType} = require 'react-addons-test-utils'
 
 Chunk  = require '../src/Chunk.js'
-DefaultRow  = require '../src/DefaultRow.js'
 
 {domFromReact, setupForTest, renderFromReactClass} = require('../src/Utils')
 
@@ -16,22 +15,24 @@ chai.use sinonChai
 
 shallowRenderer = createRenderer()
 
-getRow = (index) ->
+getRowData = (index) ->
   return ["column#{index}1", "column2#{index}", "column3#{index}"]
 
 
 describe 'chunk of table rows', ->
   beforeEach ->
-    @rows = []
-    @rows.push getRow(index) for index in [1..10]
+    @fakeRow = React.createClass
+      render: stub().returns(React.DOM.tr())
+    @rowData = []
+    @rowData.push getRowData(index) for index in [1..10]
+    @rows = @rowData.map (rowData) ->
+      rowData: @rows
+      rowClass: 'row-class'
+      colSpanOverride: 5
     setupForTest()
     @defaultProps =
-      data: [
-        rowData: @rows
-        rowClass: 'row-class'
-        colSpanOverride: 5
-      ],
-      rowComponent: DefaultRow
+      data: @rows
+      rowComponent: @fakeRow
       visible: true
     @defaultProps.plus = (props) => Object.assign {}, @defaultProps, props
 
@@ -86,13 +87,24 @@ describe 'chunk of table rows', ->
         expect(@setStateSpy).not.to.have.been.called
 
   describe 'when it updates', ->
+    beforeEach ->
+      @renderDefault()
+      @component.body = undefined
+      @component.componentDidUpdate()
     it 'should store a ref to the tbody', ->
+      expect(@component.body).to.be.truthy
+
   describe 'getting the height', ->
     describe 'when its visible', ->
       it 'should get the height from the dom', ->
     describe 'when its hidden', ->
+      beforeEach ->
+        @renderDefault @defaultProps.plus
+          visible: false
+        @component.setState
+          height: 42
       it 'should get the height from the state', ->
-
+        expect(@component.getHeight()).to.equal 42
   describe 'when checking visibility', ->
     describe 'when the scroll parent is the window', ->
       describe 'when the chunk is fully contained', ->
@@ -112,36 +124,21 @@ describe 'chunk of table rows', ->
   describe 'when it renders', ->
     describe 'when chunk is not visible', ->
       beforeEach ->
-        {@component, @element, @$domNode} = renderFromReactClass(Chunk,
-          data: [
-            rowData: @rows
-            rowClass: 'row-class'
-            colSpanOverride: 5
-          ],
-          rowComponent: DefaultRow
+        @renderDefault @defaultProps.plus
           visible: false
-        ,
-        'table'
-        )
+        @component.setState
+          height: 51
 
       it 'should render a tbody', ->
         expect(@$domNode.is('tbody')).to.be.true
       it 'should have a single child with the correct height', ->
+        expect(@component.refs.body.children[0].style.minHeight).to.equal '51px'
+        expect(@component.refs.body.children[0].style.display).to.equal 'block'
 
     describe 'when chunk is visible', ->
       beforeEach ->
-        shallowRenderer.render(React.createElement Chunk,
-          data: [
-            rowData: @rows
-            rowClass: 'row-class'
-            colSpanOverride: 5
-          ],
-          rowComponent: DefaultRow
-          visible: true
-        )
-        @row = shallowRenderer.getRenderOutput()
-
+        @renderDefault()
       it 'should render a visible chunk tbody', ->
-        expect(@row.type).to.equal 'tbody'
+        expect(@$domNode.is('tbody')).to.be.true
       it 'should have default row as its first child', ->
-        expect(isElementOfType(Children.toArray(@row.props.children)[0], DefaultRow)).to.be.true
+        expect(scryRenderedComponentsWithType(@component, @fakeRow).length).to.equal @rows.length
