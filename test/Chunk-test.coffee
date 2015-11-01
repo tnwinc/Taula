@@ -1,9 +1,10 @@
 React = require 'react'
+$ = require 'jquery'
 {scryRenderedComponentsWithType} = require 'react-addons-test-utils'
 
 Chunk  = require '../src/Chunk.js'
 
-{setupForTest, renderFromReactClass} = require('../src/Utils')
+{setupForTest, renderFromReactClass, getWrapper} = require('../src/Utils')
 
 chai = require 'chai'
 sinon = require 'sinon'
@@ -102,21 +103,110 @@ describe 'chunk of table rows', ->
           height: 42
       it 'should get the height from the state', ->
         expect(@component.getHeight()).to.equal 42
+        
   describe 'when checking visibility', ->
+    beforeEach ->
+      @style =
+        display: 'block'
+        position: 'absolute'
+        plus: (style) => Object.assign {}, @style, style
+      @renderDefault()
     describe 'when the scroll parent is the window', ->
+      beforeEach ->
+        @parent = $(window)
+        @parentHeight = @parent.height()
       describe 'when the chunk is fully contained', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{@parentHeight / 4}px"
+            height: "#{@parentHeight / 2}px"
+        it 'should report the chunk as visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.true
       describe 'when the chunk is partially off the top', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{@parentHeight / -2}px"
+            height: "#{@parentHeight}px"
+        it 'should report the chunk as visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.true
       describe 'when the chunk is partially off the bottom', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{@parentHeight / 2}px"
+            height: "#{@parentHeight}px"
+        it 'should report the chunk as visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.true
       describe 'when the chunk is off the bottom', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{2 * @parentHeight}px"
+            height: "#{@parentHeight}px"
+        it 'should report the chunk as not visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.false
       describe 'when the chunk is off the top', ->
-      describe 'when the chunk is larger than the parent height and it\'s completely visible', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{-2 * @parentHeight}px"
+            height: "#{@parentHeight}px"
+        it 'should report the chunk as not visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.false
+      describe 'when the chunk is larger than the parent height and is centered on its parent', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{@parentHeight / 4}px"
+            height: "#{@parentHeight / 2}px"
+        it 'should report the chunk as not visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.true
+
     describe 'when the scroll parent is not the window', ->
+      beforeEach ->
+        @parentHeight = 10
+        @parent = getWrapper()
+        @parent.css @style.plus
+          height: "#{@parentHeight}px"
+
       describe 'when the chunk is fully contained', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{@parentHeight / 4}px"
+            height: "#{@parentHeight / 2}px"
+        it 'should report the chunk as visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.true
       describe 'when the chunk is partially off the top', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{@parentHeight / -2}px"
+            height: "#{@parentHeight}px"
+        it 'should report the chunk as visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.true
       describe 'when the chunk is partially off the bottom', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{@parentHeight / 2}px"
+            height: "#{@parentHeight}px"
+        it 'should report the chunk as visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.true
       describe 'when the chunk is off the bottom', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{2 * @parentHeight}px"
+            height: "#{@parentHeight}px"
+        it 'should report the chunk as not visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.false
       describe 'when the chunk is off the top', ->
-      describe 'when the chunk is larger than the parent height and it\'s completely visible', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{-2 * @parentHeight}px"
+            height: "#{@parentHeight}px"
+        it 'should report the chunk as not visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.false
+      describe 'when the chunk is larger than the parent height and is centered on its parent', ->
+        beforeEach ->
+          @$domNode.css @style.plus
+            top: "#{@parentHeight / 4}px"
+            height: "#{@parentHeight / 2}px"
+        it 'should report the chunk as not visible', ->
+          expect(@component.isVisibleIn(@parent)).to.be.true
 
   describe 'when it renders', ->
     describe 'when chunk is not visible', ->
