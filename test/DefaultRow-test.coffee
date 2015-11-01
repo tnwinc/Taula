@@ -1,44 +1,42 @@
 
-React = require 'react'
-{createRenderer} = require 'react-addons-test-utils'
 DefaultRow  = require '../src/DefaultRow.js'
-
-{Children} = React
+$ = require 'jquery'
 
 chai = require 'chai'
 {expect} = chai
 
-shallowRenderer = createRenderer()
+
+{setupForTest, renderFromReactClass} = require('../src/Utils')
 
 describe 'default row', ->
+
   beforeEach ->
     @rowData = ['column1', 'column2', 'column3']
+    setupForTest()
+
   describe 'when it renders', ->
+
     beforeEach ->
-      shallowRenderer.render(React.createElement DefaultRow,
+      {@component, @element, @$domNode} = renderFromReactClass DefaultRow,
         rowData: @rowData
         rowClass: 'row-class'
         rowIndex: 42
         colSpanOverride: 5
-      )
-      @row = shallowRenderer.getRenderOutput()
+      , 'tbody'
 
     it 'should render a tr', ->
-      expect(@row.type).to.equal 'tr'
+      expect(@$domNode.is 'tr').to.be.true
 
     it 'should render a cell for each piece of data', ->
-      expect(Children.count @row.props.children).to.equal @rowData.length
-      expect(Children.toArray(@row.props.children)[0].type).to.equal 'td'
+      expect(@$domNode.find('td').length).to.equal @rowData.length
 
     it 'should pass through the className property', ->
-      expect(@row.props.className).to.equal 'row-class'
-
-    it 'should pass through the key property', ->
-      expect(@row.key).to.equal 42.toString()
+      expect(@$domNode.hasClass 'row-class').to.be.true
 
     it 'should respect the colspan property', ->
-      expect(Children.toArray(@row.props.children)[0].props.colSpan).to.equal 5
+      expect(@$domNode.find('td').attr('colspan')).to.equal '5'
 
     it 'should dump the data into the cells', ->
-      Children.forEach @row.props.children, (cell, index) =>
-        expect(cell.props.children).to.equal @rowData[index]
+      rowData = @rowData
+      @$domNode.find('td').each (index) ->
+        expect($(@).text()).to.equal rowData[index]
