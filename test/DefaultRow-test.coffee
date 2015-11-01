@@ -40,5 +40,5 @@ describe 'default row', ->
       expect(Children.toArray(@row.props.children)[0].props.colSpan).to.equal 5
 
     it 'should dump the data into the cells', ->
-      Children.forEach @row.props.children, (cell, index)=>
+      Children.forEach @row.props.children, (cell, index) =>
         expect(cell.props.children).to.equal @rowData[index]

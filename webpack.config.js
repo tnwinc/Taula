@@ -9,7 +9,7 @@ module.exports = {
     libraryTarget: 'umd'
   },
   eslint: {
-    configFile: './.eslintrc.json'
+    configFile: './.eslintrc'
   },
   module: {
     preLoaders: [

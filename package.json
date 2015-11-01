@@ -5,7 +5,7 @@
   "main": "dist/InfiniteTable.js",
   "scripts": {
     "test": "./node_modules/.bin/karma start karma-test.conf.js",
-    "lint": "./node_modules/.bin/eslint -c ./.eslintrc.json src/**/*.js ; exit 0",
+    "lint": "./node_modules/.bin/eslint -c ./.eslintrc src/**/*.js ; exit 0",
     "build": "webpack -p",
     "watch": "./node_modules/.bin/karma start karma.conf.js"
   },
@@ -17,6 +17,7 @@
     "babel-loader": "^5.3.2",
     "chai": "^3.3.0",
     "coffee-loader": "^0.7.2",
+    "coffee-react-transform": "^3.3.0",
     "coffee-script": "^1.10.0",
     "eslint": "^1.6.0",
     "eslint-config-airbnb": "^0.1.0",

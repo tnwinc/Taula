@@ -164,5 +164,5 @@ xdescribe 'InfiniteTable', ->
 
     it 'should render a row per datum', ->
       expect(Children.count @tbody.props.children).to.equal @data.length
-      Children.forEach @tbody.props.children, (row)=>
+      Children.forEach @tbody.props.children, (row) =>
         expect(row.type).to.equal @customThing

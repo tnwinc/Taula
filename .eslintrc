@@ -4,12 +4,13 @@
     "node": false,
     "es6": true
   },
-
+  "parser": "babel-eslint",
   "plugins": ["react"],
 
   "ecmaFeatures": {
     "jsx": true,
-    "modules": true
+    "modules": true,
+    "blockBindings": true
   },
 
   "extends": "airbnb",

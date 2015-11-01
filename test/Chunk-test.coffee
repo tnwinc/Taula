@@ -25,8 +25,8 @@ describe 'chunk of table rows', ->
     @rows = []
     @rows.push getRow(index) for index in [1..10]
     setupForTest()
-    @defaultProps = 
-      data:[
+    @defaultProps =
+      data: [
         rowData: @rows
         rowClass: 'row-class'
         colSpanOverride: 5
@@ -36,12 +36,12 @@ describe 'chunk of table rows', ->
     @defaultProps.plus = (props) => Object.assign {}, @defaultProps, props
 
     @renderDefault = (opts = @defaultProps) ->
-     {@component, @element, @$domNode} = renderFromReactClass(Chunk, opts , 'table')
+      {@component, @element, @$domNode} = renderFromReactClass(Chunk, opts , 'table')
 
   describe 'when it mounts', ->
     beforeEach ->
       @renderDefault()
-    it 'should store a ref to the tbody',->
+    it 'should store a ref to the tbody', ->
       expect(@component.body).to.be.truthy
 
   describe 'when the visibility changes', ->
@@ -57,14 +57,14 @@ describe 'chunk of table rows', ->
         @component.componentWillReceiveProps visible: false
 
       afterEach ->
-        @component.setState.restore();
-        @component.getHeight.restore();
+        @component.setState.restore()
+        @component.getHeight.restore()
 
       it 'should store the height', ->
         expect(@getHeightStub).to.have.been.called
         expect(@setStateSpy).to.have.been.calledWith height: 10
 
-    describe 'to visible',->
+    describe 'to visible', ->
       beforeEach ->
         props = @defaultProps.plus
           visible: false
@@ -79,41 +79,41 @@ describe 'chunk of table rows', ->
         @component.componentWillReceiveProps visible: true
 
       afterEach ->
-        @component.setState.restore();
-        @component.getHeight.restore();
+        @component.setState.restore()
+        @component.getHeight.restore()
       it 'should not store the height', ->
         expect(@getHeightStub).not.to.have.been.called
         expect(@setStateSpy).not.to.have.been.called
 
   describe 'when it updates', ->
     it 'should store a ref to the tbody', ->
-  describe 'getting the height',->
+  describe 'getting the height', ->
     describe 'when its visible', ->
-      it 'should get the height from the dom',->
+      it 'should get the height from the dom', ->
     describe 'when its hidden', ->
       it 'should get the height from the state', ->
 
   describe 'when checking visibility', ->
     describe 'when the scroll parent is the window', ->
-      describe 'when the chunk is fully contained',->
-      describe 'when the chunk is partially off the top',->
-      describe 'when the chunk is partially off the bottom',->
-      describe 'when the chunk is off the bottom',->
-      describe 'when the chunk is off the top',->
+      describe 'when the chunk is fully contained', ->
+      describe 'when the chunk is partially off the top', ->
+      describe 'when the chunk is partially off the bottom', ->
+      describe 'when the chunk is off the bottom', ->
+      describe 'when the chunk is off the top', ->
       describe 'when the chunk is larger than the parent height and it\'s completely visible', ->
-    describe 'when the scroll parent is not the window',->
-      describe 'when the chunk is fully contained',->
-      describe 'when the chunk is partially off the top',->
-      describe 'when the chunk is partially off the bottom',->
-      describe 'when the chunk is off the bottom',->
-      describe 'when the chunk is off the top',->
+    describe 'when the scroll parent is not the window', ->
+      describe 'when the chunk is fully contained', ->
+      describe 'when the chunk is partially off the top', ->
+      describe 'when the chunk is partially off the bottom', ->
+      describe 'when the chunk is off the bottom', ->
+      describe 'when the chunk is off the top', ->
       describe 'when the chunk is larger than the parent height and it\'s completely visible', ->
 
-  describe 'when it renders',->
+  describe 'when it renders', ->
     describe 'when chunk is not visible', ->
       beforeEach ->
         {@component, @element, @$domNode} = renderFromReactClass(Chunk,
-          data:[
+          data: [
             rowData: @rows
             rowClass: 'row-class'
             colSpanOverride: 5
@@ -131,14 +131,14 @@ describe 'chunk of table rows', ->
     describe 'when chunk is visible', ->
       beforeEach ->
         shallowRenderer.render(React.createElement Chunk,
-          data:[
+          data: [
             rowData: @rows
             rowClass: 'row-class'
             colSpanOverride: 5
           ],
           rowComponent: DefaultRow
           visible: true
-        ) 
+        )
         @row = shallowRenderer.getRenderOutput()
 
       it 'should render a visible chunk tbody', ->
