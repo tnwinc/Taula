@@ -14,8 +14,11 @@ module.exports.setupForTest = function setupForTest() {
   if (wrapper) {
     if (parent) {
       ReactDOM.unmountComponentAtNode(parent);
+      parent = undefined
     }
+    ReactDOM.unmountComponentAtNode(wrapper);
     document.body.removeChild(wrapper);
+    wrapper = undefined
   }
 
   wrapper = document.createElement('div');
@@ -26,13 +29,15 @@ module.exports.getWrapper = function getWrapper() {
   return $(wrapper);
 };
 
-module.exports.renderFromReactClass = function renderFromReactClass(claz, props, type = 'div') {
+module.exports.renderFromReactClass = function renderFromReactClass(claz, props, type) {
   const element = React.createElement(claz, props);
 
-  parent = document.createElement(type);
-  wrapper.appendChild(parent);
+  if (type) {
+    parent = document.createElement(type);
+    wrapper.appendChild(parent);
+  }
 
-  const component = ReactDOM.render(element, parent);
+  const component = ReactDOM.render(element, parent || wrapper);
 
   return {component, element, $domNode: $(ReactDOM.findDOMNode(component))};
 };
