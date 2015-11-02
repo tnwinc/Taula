@@ -1,7 +1,7 @@
 const React = require('react');
 const {PropTypes} = React;
 const {PureRenderMixin} = require('react-addons-pure-render-mixin');
-const {domFromReact} = require('./Utils');
+const {domFromReact} = require('./ReactUtils');
 
 const Chunk = React.createClass({
   displayName: 'Chunk',

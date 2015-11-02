@@ -1,10 +1,11 @@
 React = require 'react'
-$ = require 'jquery'
 {scryRenderedComponentsWithType} = require 'react-addons-test-utils'
+{setupForTest, renderFromReactClass, getWrapper, getMock} = require('./TestUtils')
 
-Chunk  = require '../src/Chunk.js'
+Chunk = getMock(require 'inject!../src/Chunk')
 
-{setupForTest, renderFromReactClass, getWrapper} = require('../src/Utils')
+
+{$} = require('../src/Dependencies')
 
 chai = require 'chai'
 sinon = require 'sinon'
@@ -103,7 +104,7 @@ describe 'chunk of table rows', ->
           height: 42
       it 'should get the height from the state', ->
         expect(@component.getHeight()).to.equal 42
-        
+
   describe 'when checking visibility', ->
     beforeEach ->
       @style =

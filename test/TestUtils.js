@@ -1,24 +1,21 @@
-
-const $ = require('jquery');
 const React = require('react');
 const ReactDOM = require('react-dom');
+const {$} = require('../src/Dependencies');
+const TestDependencies = require('./TestDependencies');
 
 let wrapper = undefined;
 let parent = undefined;
 
-module.exports.domFromReact = function domFromReact(component) {
-  return $(ReactDOM.findDOMNode(component));
-};
 
 module.exports.setupForTest = function setupForTest() {
   if (wrapper) {
     if (parent) {
       ReactDOM.unmountComponentAtNode(parent);
-      parent = undefined
+      parent = undefined;
     }
     ReactDOM.unmountComponentAtNode(wrapper);
     document.body.removeChild(wrapper);
-    wrapper = undefined
+    wrapper = undefined;
   }
 
   wrapper = document.createElement('div');
@@ -40,4 +37,10 @@ module.exports.renderFromReactClass = function renderFromReactClass(claz, props,
   const component = ReactDOM.render(element, parent || wrapper);
 
   return {component, element, $domNode: $(ReactDOM.findDOMNode(component))};
+};
+
+module.exports.getMock = function getMock(injector) {
+  return injector({
+    './Dependencies': TestDependencies,
+  });
 };

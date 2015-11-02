@@ -1,8 +1,7 @@
 React = require 'react'
-InfiniteTable = require '../src/InfiniteTable.js'
-DefaultRow = require '../src/DefaultRow.js'
-$ = require 'jquery'
+
 {createRenderer, scryRenderedComponentsWithType} = require 'react-addons-test-utils'
+{$} = require '../src/Dependencies'
 
 chai = require 'chai'
 sinon = require 'sinon'
@@ -12,14 +11,12 @@ chai.use sinonChai
 {expect} = chai
 {spy, stub} = sinon
 
-{setupForTest, renderFromReactClass} = require('../src/Utils')
+{setupForTest, renderFromReactClass, getMock} = require('./TestUtils')
 
-{Children} = React
-
-shallowRenderer = createRenderer()
+InfiniteTable = getMock(require 'inject!../src/InfiniteTable')
 
 describe 'InfiniteTable', ->
-  beforeEach ->
+  beforeEach (done) ->
     setupForTest()
     @data = [
       rowData: ['one']
@@ -39,6 +36,7 @@ describe 'InfiniteTable', ->
 
     @renderDefault = (opts = @defaultProps) ->
       {@component, @element, @$domNode} = renderFromReactClass(InfiniteTable, opts)
+    done()
 
   describe 'by default', ->
     beforeEach ->
@@ -156,6 +154,23 @@ describe 'InfiniteTable', ->
 
   describe 'resetting the data', ->
   describe 'the debounced load data', ->
+    beforeEach ->
+      @renderDefault()
+      @defaultProps.loadData.reset()
+    describe 'when there is more data', ->
+      beforeEach ->
+        @component.debouncedLoadData 42
+      it 'should load the data', ->
+        expect(@defaultProps.loadData).to.have.been.calledWith 42
+    describe 'when there is no more data', ->
+      beforeEach ->
+        @component.setState
+          noMoreToLoad: true
+        @component.debouncedLoadData 42
+      it 'should not load the data', ->
+        expect(@defaultProps.loadData).to.not.have.been.called
+
+
   describe 'finding the visible chunks', ->
   describe 'on scroll', ->
   describe 'rendering chunks', ->

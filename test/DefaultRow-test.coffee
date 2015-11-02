@@ -1,12 +1,13 @@
 
-DefaultRow  = require '../src/DefaultRow.js'
-$ = require 'jquery'
+{setupForTest, renderFromReactClass, getMock} = require('./TestUtils')
+
+DefaultRow = getMock(require 'inject!../src/DefaultRow')
 
 chai = require 'chai'
 {expect} = chai
 
+{$} = require '../src/Dependencies'
 
-{setupForTest, renderFromReactClass} = require('../src/Utils')
 
 describe 'default row', ->
 

@@ -2,17 +2,14 @@
 const React = require('react');
 const {PropTypes} = React;
 
-const $ = require('jquery');
-
 const PRELOAD_CHUNKS = 3;
 const MIN_CHUNKS = 1 + 2 * PRELOAD_CHUNKS;
 const TRIGGER_COUNT = Math.floor(PRELOAD_CHUNKS / 2);
 
 const Chunk = require('./Chunk');
 const update = require('react-addons-update');
-const debounce = require('lodash.debounce');
-const {domFromReact} = require('./Utils');
-const scrollparent = require('scrollparent');
+const {$, debounce, scrollparent} = require('./Dependencies');
+const {domFromReact} = require('./ReactUtils');
 
 const InfiniteTable = React.createClass({
   displayName: 'InfiniteTable',

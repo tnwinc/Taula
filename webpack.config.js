@@ -27,7 +27,7 @@ module.exports = {
       { test: /\.coffee$/, loaders: ['coffee']},
       {
         test: /\.jsx?$/,
-        exclude: /(test|dist|node_modules|bower_components)/,
+        exclude: /(dist|node_modules|bower_components)/,
         loader: 'babel?optional=runtime'
       }
     ]
