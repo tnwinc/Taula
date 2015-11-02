@@ -54,7 +54,7 @@ const Chunk = React.createClass({
     const myTop = this.body.offset().top - parentTop;
     const myBottom = myTop + this.getHeight();
     if (myBottom < 0 || myTop > parentHeight) {
-      return false
+      return false;
     }
     return true;
   },
