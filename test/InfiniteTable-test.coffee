@@ -96,12 +96,28 @@ describe 'InfiniteTable', ->
       expect(@thead.text()).to.equal 'IAMAHEADER'
 
   describe 'before the component mounts', ->
-    beforeEach ->
-      @renderDefault()
-      @component.debouncedLoadData = undefined
-      @component.componentWillMount()
-    it 'should store off a debounced version of loadData', ->
-      expect(@component.debouncedLoadData).is.a 'function'
+    describe 'when no data is passed in', ->
+      beforeEach ->
+        @renderDefault @defaultProps.plus
+          data: []
+        @component.debouncedLoadData = undefined
+        @component._updateChunkedData = spy()
+        @component.componentWillMount()
+      it 'should store off a debounced version of loadData', ->
+        expect(@component.debouncedLoadData).is.a 'function'
+      it 'should not update the chunks', ->
+        expect(@component._updateChunkedData).to.not.have.been.called
+    describe 'when data is passed in', ->
+      beforeEach ->
+        @renderDefault()
+        @component.getInitialLength = -> 1
+        @component.debouncedLoadData = undefined
+        @component._updateChunkedData = spy()
+        @component.componentWillMount()
+      it 'should store off a debounced version of loadData', ->
+        expect(@component.debouncedLoadData).is.a 'function'
+      it 'should update the chunks', ->
+        expect(@component._updateChunkedData).to.have.been.calledWith @defaultProps.data
 
   describe 'before the component updates', ->
     describe 'when the data has changed', ->
@@ -126,23 +142,45 @@ describe 'InfiniteTable', ->
         expect(@component._updateChunkedData).to.not.have.been.called
 
   describe 'when the component mounts', ->
-    beforeEach ->
-      @renderDefault()
-      @defaultProps.loadData.reset()
-      @component.getInitialLength = -> 42
-      @component.scrollParent.off 'scroll'
-      @component.scrollParent = undefined
-      @component.handleScroll = spy()
-      @component.componentDidMount()
-      @component.scrollParent.trigger 'scroll'
-    it 'should load the initial data', ->
-      expect(@defaultProps.loadData).to.have.been.calledWith 42
+    
+    describe 'when no data is passed in', ->
+      beforeEach ->
+        @renderDefault @defaultProps.plus
+          data: []
+        @defaultProps.loadData.reset()
+        @component.getInitialLength = -> 42
+        @component.scrollParent.off 'scroll'
+        @component.scrollParent = undefined
+        @component.handleScroll = spy()
+        @component.componentDidMount()
+        @component.scrollParent.trigger 'scroll'
+      it 'should load the initial data', ->
+        expect(@defaultProps.loadData).to.have.been.calledWith 42
 
-    it 'should store off its scroll parent', ->
-      expect(@component.scrollParent).to.not.equal undefined
+      it 'should store off its scroll parent', ->
+        expect(@component.scrollParent).to.not.equal undefined
 
-    it 'should attach a scroll handler to its scroll parent', ->
-      expect(@component.handleScroll).to.have.been.called
+      it 'should attach a scroll handler to its scroll parent', ->
+        expect(@component.handleScroll).to.have.been.called
+
+    describe 'when data is passed in', ->
+      beforeEach ->
+        @renderDefault()
+        @defaultProps.loadData.reset()
+        @component.getInitialLength = -> 2
+        @component.scrollParent.off 'scroll'
+        @component.scrollParent = undefined
+        @component.handleScroll = spy()
+        @component.componentDidMount()
+        @component.scrollParent.trigger 'scroll'
+      it 'should not load any more data', ->
+        expect(@defaultProps.loadData).to.not.have.been.called
+
+      it 'should store off its scroll parent', ->
+        expect(@component.scrollParent).to.not.equal undefined
+
+      it 'should attach a scroll handler to its scroll parent', ->
+        expect(@component.handleScroll).to.have.been.called
 
   describe 'before the component unmounts', ->
     beforeEach ->
@@ -176,7 +214,8 @@ describe 'InfiniteTable', ->
 
   describe 'the debounced load data', ->
     beforeEach ->
-      @renderDefault()
+      @renderDefault @defaultProps.plus
+        data: []
       @defaultProps.loadData.reset()
     describe 'when there is more data', ->
       beforeEach ->
@@ -193,6 +232,33 @@ describe 'InfiniteTable', ->
 
 
   describe 'finding the visible chunks', ->
+    beforeEach ->
+      FakeChunk::isVisibleIn = stub()
+    describe 'when all chunks are visible', ->
+      beforeEach ->
+        FakeChunk::isVisibleIn.returns true
+        @renderDefault @defaultProps.plus
+          chunkSize: 2
+      it 'should return all the chunks', ->
+        expect(@component._findVisibleChunks()).to.eql [0, 1]
+
+    describe 'when only some chunks are visible', ->
+      beforeEach ->
+        FakeChunk::isVisibleIn.onFirstCall().returns false
+        FakeChunk::isVisibleIn.onSecondCall().returns true
+        FakeChunk::isVisibleIn.onThirdCall().returns true
+        FakeChunk::isVisibleIn.onCall(4).returns false
+        FakeChunk::isVisibleIn.onCall(5).returns true
+        @renderDefault @defaultProps.plus
+          chunkSize: 1
+          data: [{}, {}, {}, {}, {}]
+        @visibleChunks = @component._findVisibleChunks()
+      it 'should return only the visible chunks', ->
+        expect(@visibleChunks).to.eql [1, 2]
+      it 'should short circuit if it gets into non-visible chunks', ->
+        expect(@visibleChunks.indexOf(3)).to.equal -1
+        expect(@visibleChunks.indexOf(4)).to.equal -1
+
   describe 'on scroll', ->
 
   describe 'rendering chunks', ->

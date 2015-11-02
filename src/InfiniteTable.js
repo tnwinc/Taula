@@ -53,13 +53,18 @@ const InfiniteTable = React.createClass({
         this.props.loadData(bottomIndex);
       }
     }, 200);
+    if (this.props.data.length > 0) {
+      this._updateChunkedData(this.props.data);
+    }
   },
-
 
   componentDidMount: function componentDidMount() {
     this.scrollParent = $(scrollparent(this.refs.table));
     this.scrollParent.on('scroll', this.handleScroll);
-    this.props.loadData(this.getInitialLength());
+    const initialLength = this.getInitialLength();
+    if (this.props.data.length < initialLength) {
+      this.props.loadData(initialLength);
+    }
   },
 
   componentWillUpdate: function componentWillUpdate(nextProps) {
