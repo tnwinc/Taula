@@ -33,6 +33,7 @@ describe 'chunk of table rows', ->
       data: @rows
       rowComponent: @fakeRow
       visible: true
+      rowIndexOffset: 0
     @defaultProps.plus = (props) => Object.assign {}, @defaultProps, props
 
     @renderDefault = (opts = @defaultProps) ->
