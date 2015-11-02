@@ -39,8 +39,7 @@ module.exports.renderFromReactClass = function renderFromReactClass(claz, props,
   return {component, element, $domNode: $(ReactDOM.findDOMNode(component))};
 };
 
-module.exports.getMock = function getMock(injector) {
-  return injector({
-    './Dependencies': TestDependencies,
-  });
+module.exports.getMock = function getMock(injector, otherMocks) {
+  const injections = Object.assign({}, {'./Dependencies': TestDependencies}, otherMocks);
+  return injector(injections);
 };
