@@ -9,160 +9,84 @@ sinonChai = require 'sinon-chai'
 chai.use sinonChai
 
 {expect} = chai
-stub = sinon.stub
+{spy, stub} = sinon
 
+{setupForTest, renderFromReactClass} = require('../src/Utils')
 
 {Children} = React
 
 shallowRenderer = createRenderer()
 
-xdescribe 'InfiniteTable', ->
+describe 'InfiniteTable', ->
+  beforeEach ->
+    setupForTest()
+    @data = [
+      rowData: ['one']
+    ,
+      rowData: ['two']
+    ,
+      rowData: ['three']
+    ]
+    @defaultProps =
+      data: @data
+      chunkSize: 5
+      columnCount: 3
+      loadingMessage: 'LOADING'
+      noDataMessage: 'NODATA'
+      loadData: spy()
+      plus: (props) => Object.assign {}, @defaultProps, props
+
+    @renderDefault = (opts = @defaultProps) ->
+      {@component, @element, @$domNode} = renderFromReactClass(InfiniteTable, opts)
+
   describe 'by default', ->
     beforeEach ->
-      @data = [
-        rowData: ['one']
-      ,
-        rowData: ['two']
-      ,
-        rowData: ['three']
-      ]
-      shallowRenderer.render(React.createElement InfiniteTable,
-        data: @data
-        pageLength: 5
-        colCount: 3
-        loadingMessage: 'LOADING'
-        noValuesMessage: 'NODATA'
-        bulkLoad: true
-      )
-      @table = shallowRenderer.getRenderOutput()
-      @tbody = Children.toArray(@table.props.children)[0]
+      @renderDefault()
 
     it 'should render a table', ->
-      expect(@table.type).to.equal 'table'
-
-    it 'should render a tbody', ->
-      expect(@tbody.type).to.equal 'tbody'
-
-    it 'should render a row per datum', ->
-      expect(Children.count @tbody.props.children).to.equal @data.length
+      expect(@$domNode.is('table')).to.be.true
 
   describe 'when the initial load is happening', ->
     beforeEach ->
-      @data = []
-      shallowRenderer.render(React.createElement InfiniteTable,
-        data: @data
+      @renderDefault @defaultProps.plus
+        data: []
         loading: true
-        loadingMessage: 'LOADING'
-        pageLength: 5
-        colCount: 3
-      )
-      @table = shallowRenderer.getRenderOutput()
-      @tbody = Children.toArray(@table.props.children)[0]
-      @messageRow = Children.only @tbody.props.children
-      @messageCell = Children.only @messageRow.props.children
+      @cells = @$domNode.find 'td'
+      @cell = @cells.eq 0
 
-    it 'should show the loading message', ->
-      expect(@messageCell.props.children).to.equal 'LOADING'
+    it 'should render a row with the loading message', ->
+      expect(@cell.text()).to.equal @defaultProps.loadingMessage
 
-    it 'should not show any other rows', ->
-      expect(Children.count @tbody.props.children).to.equal 1
+    it 'should set the colspan to the width of the table', ->
+      expect(@cell.attr 'colspan').to.equal @defaultProps.columnCount.toString()
+
+    it 'should not render any other rows', ->
+      expect(@cells.length).to.equal 1
+
 
   describe 'when no data is provided', ->
     beforeEach ->
-      @data = []
-      shallowRenderer.render(React.createElement InfiniteTable,
-        data: @data
-        loading: false
-        loadingMessage: 'LOADING'
-        noValuesMessage: 'NODATA'
-        pageLength: 5
-        colCount: 3
-      )
-      @table = shallowRenderer.getRenderOutput()
-      @tbody = Children.toArray(@table.props.children)[0]
-      @messageRow = Children.only @tbody.props.children
-      @messageCell = Children.only @messageRow.props.children
+      @renderDefault @defaultProps.plus
+        data: []
+      @cells = @$domNode.find 'td'
+      @cell = @cells.eq 0
 
-    it 'should show the no data message', ->
-      expect(@messageCell.props.children).to.equal 'NODATA'
+    it 'should render a row with the no data message', ->
+      expect(@cell.text()).to.equal @defaultProps.noDataMessage
 
-    it 'should not show any other rows', ->
-      expect(Children.count @tbody.props.children).to.equal 1
+    it 'should set the colspan to the width of the table', ->
+      expect(@cell.attr 'colspan').to.equal @defaultProps.columnCount.toString()
+
+    it 'should not render any other rows', ->
+      expect(@cells.length).to.equal 1
 
   describe 'when a header element is passed in', ->
     beforeEach ->
-      @data = [
-        rowData: ['one']
-      ,
-        rowData: ['two']
-      ,
-        rowData: ['three']
-      ]
-      shallowRenderer.render(React.createElement InfiniteTable,
-        data: @data
-        pageLength: 5
-        colCount: 3
-        headerElement: 'IAMAHEADER'
-        loadingMessage: 'LOADING'
-        noValuesMessage: 'NODATA'
-      )
-      @table = shallowRenderer.getRenderOutput()
-      @thead = Children.toArray(@table.props.children)[0]
+      @renderDefault @defaultProps.plus
+        headerElement: React.createElement 'thead', null,
+          React.createElement 'tr', null,
+            React.createElement 'th', null, 'IAMAHEADER'
+      @thead = @$domNode.find 'thead'
 
     it 'should render the header element', ->
-      expect(@thead).to.equal 'IAMAHEADER'
-
-  describe 'when a header element is passed in', ->
-    beforeEach ->
-      @data = [
-        rowData: ['one']
-      ,
-        rowData: ['two']
-      ,
-        rowData: ['three']
-      ]
-      shallowRenderer.render(React.createElement InfiniteTable,
-        data: @data
-        pageLength: 5
-        colCount: 3
-        footerElement: 'IAMAFOOTER'
-        loadingMessage: 'LOADING'
-        noValuesMessage: 'NODATA'
-      )
-      @table = shallowRenderer.getRenderOutput()
-      @tfoot = Children.toArray(@table.props.children)[1]
-
-    it 'should render the footer element', ->
-      expect(@tfoot).to.equal 'IAMAFOOTER'
-
-  describe 'when a custom renderer is passed in', ->
-    beforeEach ->
-      @data = [
-        rowData: ['one']
-      ,
-        rowData: ['two']
-      ,
-        rowData: ['three']
-      ]
-      @customThing = React.DOM.tr
-      shallowRenderer.render(React.createElement InfiniteTable,
-        data: @data
-        pageLength: 5
-        colCount: 3
-        loadingMessage: 'LOADING'
-        noValuesMessage: 'NODATA'
-        rowComponent: @customThing
-      )
-      @table = shallowRenderer.getRenderOutput()
-      @tbody = Children.toArray(@table.props.children)[0]
-
-    it 'should render a table', ->
-      expect(@table.type).to.equal 'table'
-
-    it 'should render a tbody', ->
-      expect(@tbody.type).to.equal 'tbody'
-
-    it 'should render a row per datum', ->
-      expect(Children.count @tbody.props.children).to.equal @data.length
-      Children.forEach @tbody.props.children, (row) =>
-        expect(row.type).to.equal @customThing
+      expect(@thead.text()).to.equal 'IAMAHEADER'
