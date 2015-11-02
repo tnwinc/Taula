@@ -157,12 +157,20 @@ const InfiniteTable = React.createClass({
   },
 
   _renderChunks: function _renderChunks() {
-    const {customRowComponent, columnMetadata} = this.props;
+    const {customRowComponent, columnMetadata, chunkSize} = this.props;
     const {topChunk, bottomChunk} = this.state;
     return this.state.chunks.map((data, chunkIndex) => {
       const chunkIsVisible = (chunkIndex >= topChunk && chunkIndex <= bottomChunk);
       return (
-        <Chunk visible={chunkIsVisible} ref={chunkIndex} data={data} key={chunkIndex} columnMetadata={columnMetadata} rowComponent={customRowComponent} />
+        <Chunk
+          visible={chunkIsVisible}
+          ref={chunkIndex}
+          data={data}
+          key={chunkIndex}
+          columnMetadata={columnMetadata}
+          rowComponent={customRowComponent}
+          rowIndexOffset={chunkIndex * chunkSize}
+        />
       );
     });
   },

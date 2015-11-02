@@ -17,6 +17,7 @@ const Chunk = React.createClass({
     rowComponent: PropTypes.func.isRequired,
     visible: PropTypes.bool.isRequired,
     columnMetadata: PropTypes.arrayOf(PropTypes.object),
+    rowIndexOffset: PropTypes.number.isRequired,
   },
   mixins: [PureRenderMixin],
 
@@ -61,7 +62,7 @@ const Chunk = React.createClass({
   },
 
   _renderRow: function _renderRow(datum, index) {
-    const {rowComponent, columnMetadata} = this.props;
+    const {rowComponent, columnMetadata, rowIndexOffset} = this.props;
     const Row = rowComponent;
     const {rowData, item, rowClass, colSpanOverride, otherProps} = datum;
     return (
@@ -73,7 +74,7 @@ const Chunk = React.createClass({
         item={item}
         rowClass={rowClass}
         colSpanOverride={colSpanOverride}
-        rowIndex={index}
+        rowIndex={index + rowIndexOffset}
         otherProps={otherProps}
       />
     );
