@@ -30,6 +30,7 @@ const InfiniteTable = React.createClass({
     noDataMessage: PropTypes.string,
     chunkSize: PropTypes.number.isRequired,
     loadData: PropTypes.func,
+    tableClassName: PropTypes.string,
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -167,9 +168,9 @@ const InfiniteTable = React.createClass({
   },
 
   render: function render() {
-    const {headerElement, data, loading, loadingMessage, noDataMessage, columnCount} = this.props;
+    const {headerElement, data, loading, loadingMessage, noDataMessage, columnCount, tableClassName} = this.props;
     return (
-      <table className='react-table' ref='table' onScroll={this.handleScroll}>
+      <table className={tableClassName} ref='table' onScroll={this.handleScroll}>
        { headerElement }
        {(() => {
          if (!loading && data.length === 0 && noDataMessage) {
