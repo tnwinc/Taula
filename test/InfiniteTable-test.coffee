@@ -13,6 +13,10 @@ chai.use sinonChai
 
 {setupForTest, renderFromReactClass, getMock} = require('./TestUtils')
 
+setReturns = (stubbed, def, results...) ->
+  stubbed.returns def
+  stubbed.onCall(index).returns(results[index]) for index in [0..results.length - 1] by 1
+
 FakeChunk = React.createClass
   render: ->
     React.DOM.tbody()
@@ -29,6 +33,8 @@ describe 'InfiniteTable', ->
       rowData: ['two']
     ,
       rowData: ['three']
+    ,
+      rowData: ['four']
     ]
     @defaultProps =
       data: @data
@@ -142,7 +148,7 @@ describe 'InfiniteTable', ->
         expect(@component._updateChunkedData).to.not.have.been.called
 
   describe 'when the component mounts', ->
-    
+
     describe 'when no data is passed in', ->
       beforeEach ->
         @renderDefault @defaultProps.plus
@@ -244,11 +250,7 @@ describe 'InfiniteTable', ->
 
     describe 'when only some chunks are visible', ->
       beforeEach ->
-        FakeChunk::isVisibleIn.onFirstCall().returns false
-        FakeChunk::isVisibleIn.onSecondCall().returns true
-        FakeChunk::isVisibleIn.onThirdCall().returns true
-        FakeChunk::isVisibleIn.onCall(4).returns false
-        FakeChunk::isVisibleIn.onCall(5).returns true
+        setReturns FakeChunk::isVisibleIn, false, false, true, true, false, true
         @renderDefault @defaultProps.plus
           chunkSize: 1
           data: [{}, {}, {}, {}, {}]
@@ -260,6 +262,158 @@ describe 'InfiniteTable', ->
         expect(@visibleChunks.indexOf(4)).to.equal -1
 
   describe 'on scroll', ->
+    beforeEach ->
+      FakeChunk::isVisibleIn = stub()
+    describe 'scrolled to the top', ->
+      beforeEach ->
+        setReturns FakeChunk::isVisibleIn, false, true, true
+        @renderDefault()
+        {@MIN_CHUNKS} = @component.getConstants()
+        @component.setState
+          topChunk: 1
+          bottomChunk: 1
+        @component.handleScroll()
+      it 'should set the bottom chunk to the minimum value', ->
+        expect(@component.state.bottomChunk).to.equal @MIN_CHUNKS
+
+    describe 'no change', ->
+      beforeEach ->
+        setReturns FakeChunk::isVisibleIn, false, true, true
+        @renderDefault()
+        {@MIN_CHUNKS} = @component.getConstants()
+        @component.setState
+          topChunk: 0
+          bottomChunk: 2
+          noMoreToLoad: false
+        @component.setState = spy()
+        @defaultProps.loadData.reset()
+        @component.handleScroll()
+      it 'should not set anything into the state', ->
+        expect(@component.setState).to.not.have.been.called
+      it 'should not load any data', ->
+        expect(@defaultProps.loadData).to.not.have.been.called
+
+    describe 'scrolled down, but not far enough', ->
+      beforeEach ->
+        @renderDefault()
+        {@MIN_CHUNKS, @TRIGGER_COUNT, @PRELOAD_CHUNKS} = @component.getConstants()
+        @component.setState
+          topChunk: 4
+          bottomChunk: 8
+          noMoreToLoad: false
+        @component._findVisibleChunks = stub()
+        @bottomTriggeringChunk = @component.state.bottomChunk - @TRIGGER_COUNT
+        @component._findVisibleChunks.returns [Infinity, @bottomTriggeringChunk - 1]
+        @component.setState = spy()
+        @defaultProps.loadData.reset()
+        @component.handleScroll()
+      it 'should not set anything into the state', ->
+        expect(@component.setState).to.not.have.been.called
+      it 'should not load any data', ->
+        expect(@defaultProps.loadData).to.not.have.been.called
+
+    describe 'scrolled up, but not far enough', ->
+      beforeEach ->
+        @renderDefault()
+        {@MIN_CHUNKS, @TRIGGER_COUNT, @PRELOAD_CHUNKS} = @component.getConstants()
+        @component.setState
+          topChunk: 4
+          bottomChunk: 8
+          noMoreToLoad: false
+        @component._findVisibleChunks = stub()
+        @topTriggeringChunk = @component.state.topChunk + @TRIGGER_COUNT
+        @component._findVisibleChunks.returns [@topTriggeringChunk + 1, -Infinity]
+        @component.setState = spy()
+        @defaultProps.loadData.reset()
+        @component.handleScroll()
+      it 'should not set anything into the state', ->
+        expect(@component.setState).to.not.have.been.called
+      it 'should not load any data', ->
+        expect(@defaultProps.loadData).to.not.have.been.called
+
+    describe 'scrolled down', ->
+      beforeEach ->
+        @renderDefault()
+        {@MIN_CHUNKS, @TRIGGER_COUNT, @PRELOAD_CHUNKS} = @component.getConstants()
+        @component.setState
+          topChunk: 0
+          bottomChunk: @MIN_CHUNKS
+          noMoreToLoad: false
+        @component._findVisibleChunks = stub()
+        @bottomTriggeringChunk = @component.state.bottomChunk - @TRIGGER_COUNT
+        @component._findVisibleChunks.returns [@bottomTriggeringChunk - 1, @bottomTriggeringChunk]
+        @component.setState = spy()
+        @defaultProps.loadData.reset()
+        @component.handleScroll()
+      it 'should set the new chunks into the state', ->
+        expect(@component.setState).to.have.been.calledWith
+          topChunk: @bottomTriggeringChunk - 1 - @PRELOAD_CHUNKS
+          bottomChunk: @bottomTriggeringChunk + @PRELOAD_CHUNKS
+      it 'should load the data', ->
+        expect(@defaultProps.loadData).to.have.been.calledWith((@bottomTriggeringChunk + @PRELOAD_CHUNKS + 1) * @defaultProps.chunkSize)
+
+    describe 'scrolled up', ->
+      beforeEach ->
+        @renderDefault()
+        {@MIN_CHUNKS, @TRIGGER_COUNT, @PRELOAD_CHUNKS} = @component.getConstants()
+        @component.setState
+          topChunk: 4
+          bottomChunk: 10000
+          noMoreToLoad: false
+        @component._findVisibleChunks = stub()
+        @topTriggeringChunk = @component.state.topChunk + @TRIGGER_COUNT
+        @component._findVisibleChunks.returns [@topTriggeringChunk - 1, @topTriggeringChunk]
+        @component.setState = spy()
+        @defaultProps.loadData.reset()
+        @component.handleScroll()
+      it 'should set the new chunks into the state', ->
+        expect(@component.setState).to.have.been.calledWith
+          topChunk: @topTriggeringChunk - 1 - @PRELOAD_CHUNKS
+          bottomChunk: @topTriggeringChunk + @PRELOAD_CHUNKS
+      it 'should not load any data', ->
+        expect(@defaultProps.loadData).to.not.have.been.called
+
+    describe 'scrolled way down', ->
+      beforeEach ->
+        @renderDefault()
+        {@MIN_CHUNKS, @TRIGGER_COUNT, @PRELOAD_CHUNKS} = @component.getConstants()
+        @component.setState
+          topChunk: 0
+          bottomChunk: @MIN_CHUNKS
+          noMoreToLoad: false
+        @component._findVisibleChunks = stub()
+        @newBottomChunk = 10000
+        @component._findVisibleChunks.returns [@newBottomChunk, @newBottomChunk + 1]
+        @component.setState = spy()
+        @defaultProps.loadData.reset()
+        @component.handleScroll()
+      it 'should set the new chunks into the state', ->
+        expect(@component.setState).to.have.been.calledWith
+          topChunk: @newBottomChunk - @PRELOAD_CHUNKS
+          bottomChunk: @newBottomChunk + 1 + @PRELOAD_CHUNKS
+      it 'should load the data', ->
+        expect(@defaultProps.loadData).to.have.been.calledWith((@newBottomChunk + 1 + @PRELOAD_CHUNKS + 1) * @defaultProps.chunkSize)
+
+    describe 'scrolled way up', ->
+      beforeEach ->
+        @renderDefault()
+        {@MIN_CHUNKS, @TRIGGER_COUNT, @PRELOAD_CHUNKS} = @component.getConstants()
+        @component.setState
+          topChunk: 10000
+          bottomChunk: 100001
+          noMoreToLoad: false
+        @component._findVisibleChunks = stub()
+        @newTopChunk = 100
+        @component._findVisibleChunks.returns [@newTopChunk, @newTopChunk + 1]
+        @component.setState = spy()
+        @defaultProps.loadData.reset()
+        @component.handleScroll()
+      it 'should set the new chunks into the state', ->
+        expect(@component.setState).to.have.been.calledWith
+          topChunk: @newTopChunk - @PRELOAD_CHUNKS
+          bottomChunk: @newTopChunk + 1 + @PRELOAD_CHUNKS
+      it 'should not load the data', ->
+        expect(@defaultProps.loadData).to.not.have.been.called
 
   describe 'rendering chunks', ->
     beforeEach ->

@@ -86,6 +86,12 @@ const InfiniteTable = React.createClass({
     this.setState(this.getInitialState(), callback);
   },
 
+  getConstants: function getConstants() {
+    return {
+      PRELOAD_CHUNKS, MIN_CHUNKS, TRIGGER_COUNT,
+    };
+  },
+
   _updateChunkedData: function _updateChunkedData(data) {
     const chunks = this.state.chunks;
     const {chunkSize} = this.props;
@@ -133,13 +139,15 @@ const InfiniteTable = React.createClass({
     const {topChunk, bottomChunk} = this.state;
     const visibleChunks = this._findVisibleChunks();
     const newTopChunk = Math.max(visibleChunks[0] - PRELOAD_CHUNKS, 0);
-    const newBottomChunk = Math.max(visibleChunks[0] + PRELOAD_CHUNKS, MIN_CHUNKS);
+    const newBottomChunk = Math.max(visibleChunks[visibleChunks.length - 1] + PRELOAD_CHUNKS, MIN_CHUNKS);
     const triggeringChunkTop = topChunk + TRIGGER_COUNT;
     const triggeringChunkBottom = bottomChunk - TRIGGER_COUNT;
     const scrolledDown = visibleChunks[visibleChunks.length - 1] >= triggeringChunkBottom;
     const scrolledUp = topChunk > 0 && visibleChunks[0] <= triggeringChunkTop;
-    if (scrolledDown || scrolledUp) {
+    if (scrolledDown) {
       this.debouncedLoadData((newBottomChunk + 1) * chunkSize);
+    }
+    if (scrolledDown || scrolledUp) {
       this.setState({
         topChunk: newTopChunk,
         bottomChunk: newBottomChunk,
