@@ -9,7 +9,6 @@ const TRIGGER_COUNT = Math.floor(PRELOAD_CHUNKS / 2);
 const Chunk = require('./Chunk');
 const update = require('react-addons-update');
 const {$, debounce, scrollparent} = require('./Dependencies');
-const {domFromReact} = require('./ReactUtils');
 
 const InfiniteTable = React.createClass({
   displayName: 'InfiniteTable',
@@ -83,7 +82,6 @@ const InfiniteTable = React.createClass({
   },
 
   resetData: function resetData(callback) {
-    domFromReact(this.refs.table).scrollTop(0);
     this.setState(this.getInitialState(), callback);
   },
 

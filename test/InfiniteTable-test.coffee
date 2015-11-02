@@ -209,8 +209,6 @@ describe 'InfiniteTable', ->
       @component.getInitialState = spy()
       @component.resetData @callback
 
-    xit 'should do some sort of scroll thing?'
-
     it 'should reload the initial state', ->
       expect(@component.setState).to.have.been.called
       expect(@component.getInitialState).to.have.been.called
