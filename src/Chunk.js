@@ -53,10 +53,7 @@ const Chunk = React.createClass({
     const parentTop = parentOffset ? parentOffset.top : parent.scrollTop();
     const myTop = this.body.offset().top - parentTop;
     const myBottom = myTop + this.getHeight();
-    if (myBottom < 0 || myTop > parentHeight) {
-      return false;
-    }
-    return true;
+    return myBottom >= 0 && myTop <= parentHeight;
   },
 
   _updateElementCache: function _updateEndRows() {
