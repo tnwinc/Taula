@@ -214,3 +214,43 @@ describe 'InfiniteTable', ->
       expect(@chunks[4].props.visible).to.be.false
 
   describe 'updating the chunked data', ->
+    describe 'when there is still more data', ->
+      beforeEach ->
+        @renderDefault @defaultProps.plus
+          chunkSize: 2
+        @oldChunks = [[{old: 'old'}]]
+        @component.setState
+          chunks: @oldChunks
+        @newData = [{new: 'new'},{new: 'new'},{1: '1'},{2: '2'}, {3: '3'}, {4: '4'}]
+        @component.setState = spy()
+        @component._updateChunkedData @newData
+        @updatedChunks = @component.setState.firstCall.args[0].chunks
+      it 'should set the state to have the new chunks', ->
+        expect(@updatedChunks.length).to.equal 3
+      it 'should not overwrite existing chunks', ->
+        expect(@updatedChunks[0]).to.equal @oldChunks[0]
+      it 'should append the new chunks', ->
+        expect(@updatedChunks[1]).to.eql [@newData[2], @newData[3]]
+        expect(@updatedChunks[2]).to.eql [@newData[4], @newData[5]]
+      it 'should set the state to having more data to load', ->
+        expect(@component.setState.firstCall.args[0].noMoreToLoad).to.be.false
+    describe 'when we don\'t get all the requested data', ->
+      beforeEach ->
+        @renderDefault @defaultProps.plus
+          chunkSize: 2
+        @oldChunks = [[{old: 'old'}]]
+        @component.setState
+          chunks: @oldChunks
+        @newData = [{new: 'new'},{new: 'new'},{1: '1'},{2: '2'}, {3: '3'}]
+        @component.setState = spy()
+        @component._updateChunkedData @newData
+        @updatedChunks = @component.setState.firstCall.args[0].chunks
+      it 'should set the state to have the new chunks', ->
+        expect(@updatedChunks.length).to.equal 3
+      it 'should not overwrite existing chunks', ->
+        expect(@updatedChunks[0]).to.equal @oldChunks[0]
+      it 'should append the new chunks', ->
+        expect(@updatedChunks[1]).to.eql [@newData[2], @newData[3]]
+        expect(@updatedChunks[2]).to.eql [@newData[4]]
+      it 'should set the state to having more data to load', ->
+        expect(@component.setState.firstCall.args[0].noMoreToLoad).to.be.true
