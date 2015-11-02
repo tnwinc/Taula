@@ -13,7 +13,12 @@ chai.use sinonChai
 
 {setupForTest, renderFromReactClass, getMock} = require('./TestUtils')
 
-InfiniteTable = getMock(require 'inject!../src/InfiniteTable')
+FakeChunk = React.createClass
+  render: ->
+    React.DOM.tbody()
+
+InfiniteTable = getMock require('inject!../src/InfiniteTable'),
+  './Chunk': FakeChunk
 
 describe 'InfiniteTable', ->
   beforeEach (done) ->
@@ -153,6 +158,22 @@ describe 'InfiniteTable', ->
       expect(@component.handleScroll).to.not.have.been.called
 
   describe 'resetting the data', ->
+    beforeEach ->
+      @renderDefault()
+      @callback = spy()
+      @component.setState = spy()
+      @component.getInitialState = spy()
+      @component.resetData @callback
+
+    xit 'should do some sort of scroll thing?'
+
+    it 'should reload the initial state', ->
+      expect(@component.setState).to.have.been.called
+      expect(@component.getInitialState).to.have.been.called
+
+    it 'should use the passed in callback as its setState callback', ->
+      expect(@component.setState.firstCall.args[1]).to.equal @callback
+
   describe 'the debounced load data', ->
     beforeEach ->
       @renderDefault()
@@ -173,5 +194,23 @@ describe 'InfiniteTable', ->
 
   describe 'finding the visible chunks', ->
   describe 'on scroll', ->
+
   describe 'rendering chunks', ->
+    beforeEach ->
+      @renderDefault()
+      @component.setState
+        chunks: [[{}],[{}],[{}],[{}],[{}]]
+        topChunk: 1
+        bottomChunk: 3
+      @component._renderChunks()
+      @chunks = scryRenderedComponentsWithType(@component, FakeChunk)
+    it 'should render each chunk', ->
+      expect(@chunks.length).to.equal 5
+    it 'should set the appropriate visibility on the chunks', ->
+      expect(@chunks[0].props.visible).to.be.false
+      expect(@chunks[1].props.visible).to.be.true
+      expect(@chunks[2].props.visible).to.be.true
+      expect(@chunks[3].props.visible).to.be.true
+      expect(@chunks[4].props.visible).to.be.false
+
   describe 'updating the chunked data', ->
