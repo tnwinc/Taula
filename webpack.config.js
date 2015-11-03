@@ -4,8 +4,8 @@ module.exports = {
   entry: './src/InfiniteTable.js',
   output: {
     path: path.join(__dirname, '/dist'),
-    filename: 'InfiniteTable.js',
-    library: 'InfiniteTable',
+    filename: 'Taula.js',
+    library: 'Taula',
     libraryTarget: 'umd'
   },
   eslint: {
