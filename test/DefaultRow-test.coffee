@@ -19,8 +19,8 @@ describe 'default row', ->
 
     beforeEach ->
       {@component, @element, @$domNode} = renderFromReactClass DefaultRow,
-        rowData: @rowData
-        rowClass: 'row-class'
+        item: @rowData
+        className: 'row-class'
         rowIndex: 42
         colSpanOverride: 5
       , 'tbody'

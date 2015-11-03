@@ -8,7 +8,6 @@ const Chunk = React.createClass({
 
   propTypes: {
     data: PropTypes.arrayOf(PropTypes.shape({
-      rowData: PropTypes.arrayOf(PropTypes.node),
       item: PropTypes.object,
       rowClass: PropTypes.string,
       colSpanOverride: PropTypes.number,
@@ -64,15 +63,14 @@ const Chunk = React.createClass({
   _renderRow: function _renderRow(datum, index) {
     const {rowComponent, columnMetadata, rowIndexOffset} = this.props;
     const Row = rowComponent;
-    const {rowData, item, rowClass, colSpanOverride, otherProps} = datum;
+    const {item, className, colSpanOverride, otherProps} = datum;
     return (
       <Row
         ref={index}
         key={index}
         columnMetadata={columnMetadata}
-        rowData={rowData}
         item={item}
-        rowClass={rowClass}
+        className={className}
         colSpanOverride={colSpanOverride}
         rowIndex={index + rowIndexOffset}
         otherProps={otherProps}

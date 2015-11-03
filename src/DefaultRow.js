@@ -5,8 +5,8 @@ const {PropTypes} = React;
 const DefaultRow = React.createClass({
   displayName: 'DefaultRow',
   propTypes: {
-    rowData: PropTypes.arrayOf(PropTypes.node).isRequired,
-    rowClass: PropTypes.string,
+    item: PropTypes.arrayOf(PropTypes.node).isRequired,
+    className: PropTypes.string,
     colSpanOverride: PropTypes.number,
     rowIndex: PropTypes.number.isRequired,
   },
@@ -14,11 +14,11 @@ const DefaultRow = React.createClass({
     return (<td key={index} colSpan={this.props.colSpanOverride}>{cellData}</td>);
   },
   render: function render() {
-    const {rowData, rowClass, rowIndex} = this.props;
+    const {item, className, rowIndex} = this.props;
     return (
-      <tr className={rowClass} key={rowIndex}>
+      <tr className={className} key={rowIndex}>
        {
-         rowData.map(this._renderCell)
+         item.map(this._renderCell)
        }
       </tr>
     );

@@ -19,10 +19,10 @@ const InfiniteTable = React.createClass({
     columnMetadata: PropTypes.arrayOf(PropTypes.object),
     columnCount: PropTypes.number.isRequired,
     data: PropTypes.arrayOf(PropTypes.shape({
-      rowData: PropTypes.arrayOf(PropTypes.node),
-      item: PropTypes.object,
-      rowClass: PropTypes.string,
+      item: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+      className: PropTypes.string,
       colSpanOverride: PropTypes.number,
+      otherProps: PropTypes.object,
     })).isRequired,
     loading: PropTypes.bool,
     loadingMessage: PropTypes.node,

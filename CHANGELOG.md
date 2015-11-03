@@ -6,6 +6,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Lint coffeescript files in `npm run lint`
 
+### Removed
+- Simplified data so that item handles the use case previously handled by rowData (now removed)
+
+### Fixed
+- Classnames and colspans for rows didn't pass through correctly
+
+
 ## [0.2.2] - 2015-11-03
 ### Changed
 - Updated README
