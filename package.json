@@ -12,19 +12,16 @@
   "bugs": "https://github.com/tnwinc/Taula/issues",
   "scripts": {
     "test": "./node_modules/.bin/karma start karma-test.conf.js",
-    "lint": "./node_modules/.bin/eslint -c ./.eslintrc src/**/*.js ; exit 0",
+    "lint": "./node_modules/.bin/eslint -c ./.eslintrc src/**/*.js; ./node_modules/.bin/coffeelint test/*.coffee; exit 0",
     "build": "./node_modules/.bin/webpack -p",
     "watch": "./node_modules/.bin/karma start karma.conf.js"
   },
-  "contributors": [
-    {
-      "name": "Will Stamper",
-      "url": "http://willstamper.name"
-    },
-    {
-      "name": "Tej Gandham"
-    }
-  ],
+  "contributors": [{
+    "name": "Will Stamper",
+    "url": "http://willstamper.name"
+  }, {
+    "name": "Tej Gandham"
+  }],
   "repository": {
     "type": "git",
     "url": "https://github.com/tnwinc/Taula.git"
@@ -38,6 +35,7 @@
     "coffee-loader": "^0.7.2",
     "coffee-react-transform": "^3.3.0",
     "coffee-script": "^1.10.0",
+    "coffeelint": "^1.13.1",
     "eslint": "^1.6.0",
     "eslint-config-airbnb": "^0.1.0",
     "eslint-loader": "^1.1.0",
