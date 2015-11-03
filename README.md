@@ -2,7 +2,7 @@
 
 ![Taula](./Taula.jpg)
 
-[![Build Status](https://travis-ci.org/tnwinc/Taula.svg?branch=master)](https://travis-ci.org/tnwinc/Taula)
+[![Build Status](https://travis-ci.org/tnwinc/Taula.svg?branch=master)](https://travis-ci.org/tnwinc/Taula) [![npm version](https://badge.fury.io/js/taula.svg)](https://www.npmjs.com/package/taula)
 
 "Infinite" or "Indefinite" scrolling in a react-based CardTable.
 
