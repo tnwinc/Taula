@@ -1,6 +1,6 @@
 {
   "name": "taula",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A table that will scroll forever, if you give it enough data.",
   "main": "dist/Taula.js",
   "keywords": ["table", "infinite", "react"],
