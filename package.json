@@ -1,16 +1,28 @@
 {
-  "name": "infinite-table",
-  "version": "0.0.1",
-  "description": "",
+  "name": "taula",
+  "version": "0.1.0",
+  "description": "A table that will scroll forever, if you give it enough data.",
   "main": "dist/InfiniteTable.js",
+  "keywords": ["table", "infinite", "react"],
+  "homepage": "https://github.com/tnwinc/infiniteTable",
+  "bugs": "https://github.com/tnwinc/infiniteTable/issues",
   "scripts": {
     "test": "./node_modules/.bin/karma start karma-test.conf.js",
     "lint": "./node_modules/.bin/eslint -c ./.eslintrc src/**/*.js ; exit 0",
-    "build": "webpack -p",
+    "build": "./node_modules/.bin/webpack -p",
     "watch": "./node_modules/.bin/karma start karma.conf.js"
   },
-  "author": "Will Stamper",
-  "license": "ISC",
+  "contributors": [{
+    "name": "Will Stamper",
+    "url": "http://willstamper.name"
+  }, {
+    "name": "Tej Gandham"
+  }],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tnwinc/infiniteTable.git"
+  },
+  "license": "MIT",
   "devDependencies": {
     "babel-core": "^5.8.25",
     "babel-eslint": "^4.1.3",
