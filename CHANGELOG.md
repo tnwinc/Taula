@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.1] - 2015-11-03
+### Changed
+- Updated README for 0.3.0
+
 ## [0.3.0] - 2015-11-03
 ### Added
 - Lint coffeescript files in `npm run lint`
