@@ -2,10 +2,10 @@
   "name": "taula",
   "version": "0.1.0",
   "description": "A table that will scroll forever, if you give it enough data.",
-  "main": "dist/InfiniteTable.js",
+  "main": "dist/Taula.js",
   "keywords": ["table", "infinite", "react"],
-  "homepage": "https://github.com/tnwinc/infiniteTable",
-  "bugs": "https://github.com/tnwinc/infiniteTable/issues",
+  "homepage": "https://github.com/tnwinc/Taula",
+  "bugs": "https://github.com/tnwinc/Taula/issues",
   "scripts": {
     "test": "./node_modules/.bin/karma start karma-test.conf.js",
     "lint": "./node_modules/.bin/eslint -c ./.eslintrc src/**/*.js ; exit 0",
@@ -20,7 +20,7 @@
   }],
   "repository": {
     "type": "git",
-    "url": "https://github.com/tnwinc/infiniteTable.git"
+    "url": "https://github.com/tnwinc/Taula.git"
   },
   "license": "MIT",
   "devDependencies": {
