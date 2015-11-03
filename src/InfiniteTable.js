@@ -26,7 +26,7 @@ const InfiniteTable = React.createClass({
     })).isRequired,
     loading: PropTypes.bool,
     loadingMessage: PropTypes.node,
-    noDataMessage: PropTypes.string,
+    noDataMessage: PropTypes.node,
     chunkSize: PropTypes.number.isRequired,
     loadData: PropTypes.func,
     tableClassName: PropTypes.string,
@@ -186,7 +186,7 @@ const InfiniteTable = React.createClass({
        }
        )()}
        {
-         loading ? <tbody><tr className='centered-row'><td colSpan={columnCount}>{loadingMessage}</td></tr></tbody> : undefined
+         (loading && loadingMessage) ? <tbody><tr className='centered-row'><td colSpan={columnCount}>{loadingMessage}</td></tr></tbody> : undefined
        }
       </table>
     );

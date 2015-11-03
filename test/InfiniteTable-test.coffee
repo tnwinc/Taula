@@ -57,21 +57,34 @@ describe 'InfiniteTable', ->
       expect(@$domNode.is('table')).to.be.true
 
   describe 'when the initial load is happening', ->
-    beforeEach ->
-      @renderDefault @defaultProps.plus
-        data: []
-        loading: true
-      @cells = @$domNode.find 'td'
-      @cell = @cells.eq 0
+    describe 'and a loading message was passed in', ->
+      beforeEach ->
+        @renderDefault @defaultProps.plus
+          data: []
+          loading: true
+        @cells = @$domNode.find 'td'
+        @cell = @cells.eq 0
 
-    it 'should render a row with the loading message', ->
-      expect(@cell.text()).to.equal @defaultProps.loadingMessage
+      it 'should render a row with the loading message', ->
+        expect(@cell.text()).to.equal @defaultProps.loadingMessage
 
-    it 'should set the colspan to the width of the table', ->
-      expect(@cell.attr 'colspan').to.equal @defaultProps.columnCount.toString()
+      it 'should set the colspan to the width of the table', ->
+        expect(@cell.attr 'colspan').to.equal @defaultProps.columnCount.toString()
 
-    it 'should not render any other rows', ->
-      expect(@cells.length).to.equal 1
+      it 'should not render any other rows', ->
+        expect(@cells.length).to.equal 1
+
+    describe 'and a loading message was NOT passed in', ->
+      beforeEach ->
+        @renderDefault @defaultProps.plus
+          data: []
+          loading: true
+          loadingMessage: undefined
+        @cells = @$domNode.find 'td'
+        @cell = @cells.eq 0
+
+      it 'should not render any rows', ->
+        expect(@cells.length).to.equal 0
 
 
   describe 'when no data is provided', ->
