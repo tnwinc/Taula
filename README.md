@@ -27,12 +27,10 @@ All properties are optional unless specified otherwise.
   - contains the data that will be rendered into the table
   - all values are passed through to the customRowComponent, if used
   - Structure:
-    - rowData (array of nodes)
-      - If you want simple `<tr><td/></tr>` rows, you want to use this
-      - With no customRowComponent, Taula will just map rowData to `<td>s`
-    - item (object)
+    - item (object or array)
       - an unstructured place to store the data for a row
-    - rowClass
+      - If you don't provide a customRowComponent, it should be an Array
+    - className
       - a className given to the row if customRowComponent isn't used
     - colSpanOverride
       - set as the colspan attribute of each `<td>`
