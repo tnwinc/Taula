@@ -2,7 +2,7 @@
 
 ![Taula](./Taula.jpg)
 
-[![Build Status](https://travis-ci.org/tnwinc/Taula.svg?branch=master)](https://travis-ci.org/tnwinc/Taula)
+[![Build Status](https://travis-ci.org/tnwinc/Taula.svg?branch=master)](https://travis-ci.org/tnwinc/Taula) [![npm version](https://badge.fury.io/js/taula.svg)](https://www.npmjs.com/package/taula)
 
 "Infinite" or "Indefinite" scrolling in a react-based CardTable.
 
@@ -35,6 +35,8 @@ All properties are optional unless specified otherwise.
     - colSpanOverride
       - set as the colspan attribute of each `<td>`
       - useful if you want, for example, a cell to take up the full row
+    - otherProps
+      - a dumping ground for other row-implementation-specific properties
 - chunkSize (required)
   - minimum number of pieces of data to load at a time
   - Taula should accomodate small chunks, but bigger chunks means better performance on the client
