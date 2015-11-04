@@ -23,6 +23,7 @@ const InfiniteTable = React.createClass({
       className: PropTypes.string,
       colSpanOverride: PropTypes.number,
       otherProps: PropTypes.object,
+      getMoreRowClasses: PropTypes.func,
     })).isRequired,
     loading: PropTypes.bool,
     loadingMessage: PropTypes.node,

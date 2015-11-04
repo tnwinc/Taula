@@ -12,6 +12,7 @@ const Chunk = React.createClass({
       rowClass: PropTypes.string,
       colSpanOverride: PropTypes.number,
       otherProps: PropTypes.object,
+      getMoreRowClasses: PropTypes.func,
     })).isRequired,
     rowComponent: PropTypes.func.isRequired,
     visible: PropTypes.bool.isRequired,
@@ -63,7 +64,7 @@ const Chunk = React.createClass({
   _renderRow: function _renderRow(datum, index) {
     const {rowComponent, columnMetadata, rowIndexOffset} = this.props;
     const Row = rowComponent;
-    const {item, className, colSpanOverride, otherProps} = datum;
+    const {item, className, colSpanOverride, otherProps, getMoreRowClasses} = datum;
     return (
       <Row
         ref={index}
@@ -74,6 +75,7 @@ const Chunk = React.createClass({
         colSpanOverride={colSpanOverride}
         rowIndex={index + rowIndexOffset}
         otherProps={otherProps}
+        getMoreRowClasses={getMoreRowClasses}
       />
     );
   },
