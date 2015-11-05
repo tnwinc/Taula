@@ -1,6 +1,6 @@
 {
   "name": "taula",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "A table that will scroll forever, if you give it enough data.",
   "main": "dist/Taula.js",
   "keywords": [
@@ -16,12 +16,15 @@
     "build": "./node_modules/.bin/webpack -p",
     "watch": "./node_modules/.bin/karma start karma.conf.js"
   },
-  "contributors": [{
-    "name": "Will Stamper",
-    "url": "http://willstamper.name"
-  }, {
-    "name": "Tej Gandham"
-  }],
+  "contributors": [
+    {
+      "name": "Will Stamper",
+      "url": "http://willstamper.name"
+    },
+    {
+      "name": "Tej Gandham"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/tnwinc/Taula.git"
