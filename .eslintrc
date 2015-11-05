@@ -45,6 +45,7 @@
     "react/display-name": 2, // Prevent missing displayName in a React component definition
     "react/no-danger": 2, // Prevent using dangerous properties
     "react/jsx-no-undef": 2, // Disallow undeclared variables in JSX
+    "react/jsx-no-bind": 2,
     "react/jsx-uses-react": 2, // Prevent React to be incorrectly marked as unused
     "react/jsx-uses-vars": 2, // Prevent variables used in JSX to be incorrectly marked as unused
     "react/no-did-mount-set-state": 2, // Prevent usage of setState in componentDidMount

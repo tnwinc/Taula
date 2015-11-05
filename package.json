@@ -16,15 +16,12 @@
     "build": "./node_modules/.bin/webpack -p",
     "watch": "./node_modules/.bin/karma start karma.conf.js"
   },
-  "contributors": [
-    {
-      "name": "Will Stamper",
-      "url": "http://willstamper.name"
-    },
-    {
-      "name": "Tej Gandham"
-    }
-  ],
+  "contributors": [{
+    "name": "Will Stamper",
+    "url": "http://willstamper.name"
+  }, {
+    "name": "Tej Gandham"
+  }],
   "repository": {
     "type": "git",
     "url": "https://github.com/tnwinc/Taula.git"
@@ -42,7 +39,7 @@
     "eslint": "^1.6.0",
     "eslint-config-airbnb": "^0.1.0",
     "eslint-loader": "^1.1.0",
-    "eslint-plugin-react": "^3.5.1",
+    "eslint-plugin-react": "^3.7.1",
     "inject-loader": "^2.0.1",
     "isparta-loader": "^1.0.0",
     "jsx-loader": "^0.13.2",
