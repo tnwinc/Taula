@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.4.0] - 2015-11-05
+### Added
+- Each object in data can take a `getMoreRowClasses` property, which can be used to dynamically determine a class for the row based on the value or index of the row
+- Added new eslint rule (`jsx-no-bind`)
+
+### Changed
+- Small performance improvements
+
 ## [0.3.1] - 2015-11-03
 ### Changed
 - Updated README for 0.3.0

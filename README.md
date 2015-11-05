@@ -37,6 +37,12 @@ All properties are optional unless specified otherwise.
       - useful if you want, for example, a cell to take up the full row
     - otherProps
       - a dumping ground for other row-implementation-specific properties
+    - getMoreRowClasses
+      - a function that is used to dynamically calculate styles to apply to the row
+      - parameters
+        - base: the className passed in in the className property (useful if you have a generic row class)
+        - item: the item in the item property (useful for styling based on the data, ex. an overdue style)
+        - index: the index of the row in the table as a whole (useful for odd/even striping)
 - chunkSize (required)
   - minimum number of pieces of data to load at a time
   - Taula should accomodate small chunks, but bigger chunks means better performance on the client
