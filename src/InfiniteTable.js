@@ -177,7 +177,7 @@ const InfiniteTable = React.createClass({
   render: function render() {
     const {headerElement, data, loading, loadingMessage, noDataMessage, columnCount, tableClassName} = this.props;
     return (
-      <table className={tableClassName} ref='table' onScroll={this.handleScroll}>
+      <table className={tableClassName} ref='table'>
        { headerElement }
        {(() => {
          if (!loading && data.length === 0 && noDataMessage) {
