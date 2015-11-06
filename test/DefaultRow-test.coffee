@@ -4,7 +4,11 @@
 DefaultRow = getMock(require 'inject!../src/DefaultRow')
 
 chai = require 'chai'
+sinon = require 'sinon'
+sinonChai = require 'sinon-chai'
+chai.use sinonChai
 {expect} = chai
+{stub} = sinon
 
 {$} = require '../src/Dependencies'
 
@@ -41,3 +45,21 @@ describe 'default row', ->
       rowData = @rowData
       @$domNode.find('td').each (index) ->
         expect($(@).text()).to.equal rowData[index]
+
+  describe 'when it has a getMoreRowClasses property', ->
+    beforeEach ->
+      @rowClass = stub()
+      @rowClass.returns 'myClass'
+      {@component, @element, @$domNode} = renderFromReactClass DefaultRow,
+        item: @rowData
+        className: 'row-class'
+        rowIndex: 42
+        colSpanOverride: 5
+        getMoreRowClasses: @rowClass
+      , 'tbody'
+
+    it 'should use the getMoreRowClasses property to get the classes', ->
+      (expect @rowClass).to.have.been.calledWith 'row-class', @rowData, 42
+
+    it 'should apply the result as the className', ->
+      (expect @$domNode.hasClass('myClass')).to.be.true
